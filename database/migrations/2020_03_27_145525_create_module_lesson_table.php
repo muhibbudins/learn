@@ -13,13 +13,14 @@ class CreateModuleLessonTable extends Migration
      */
     public function up()
     {
-        Schema::create('module_lesson', function (Blueprint $table) {
+        Schema::create('module_lessons', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('title');
-            $table->string('description');
+            $table->string('description')->default('');
             $table->text('content');
-            $table->boolean('status');
+            $table->boolean('status')->default(false);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -30,6 +31,6 @@ class CreateModuleLessonTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('module_lesson');
+        Schema::dropIfExists('module_lessons');
     }
 }

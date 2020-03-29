@@ -13,15 +13,16 @@ class CreateModuleQuizTable extends Migration
      */
     public function up()
     {
-        Schema::create('module_quiz', function (Blueprint $table) {
+        Schema::create('module_quizzes', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('title');
-            $table->string('description');
-            $table->integer('order');
+            $table->string('description')->default('');
+            $table->integer('order')->default(0);
             $table->integer('answer');
             $table->text('content');
-            $table->boolean('status');
+            $table->boolean('status')->default(false);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -32,6 +33,6 @@ class CreateModuleQuizTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('module_quiz');
+        Schema::dropIfExists('module_quizzes');
     }
 }

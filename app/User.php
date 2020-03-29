@@ -5,9 +5,13 @@ namespace App;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class User extends Authenticatable
+use Tymon\JWTAuth\Contracts\JWTSubject;
+
+class User extends Authenticatable implements JWTSubject
 {
+    use SoftDeletes;
     use Notifiable;
 
     /**
@@ -16,7 +20,14 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name',
+        'email',
+        'password',
+        'role',
+        'firstname',
+        'lastname',
+        'address',
+        'status',
     ];
 
     /**
@@ -36,4 +47,20 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * JWT Identifier
+     */
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+     /**
+      * JWT Claims
+      */
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
 }

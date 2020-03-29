@@ -17,10 +17,11 @@ class CreateModuleQuizChoicesTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('quiz_id');
             $table->string('content');
-            $table->integer('order');
+            $table->integer('order')->default(0);
             $table->timestamps();
+            $table->softDeletes();
 
-            $table->foreign('quiz_id')->references('id')->on('module_quiz');
+            $table->foreign('quiz_id')->references('id')->on('module_quizzes');
         });
     }
 

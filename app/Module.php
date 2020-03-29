@@ -3,13 +3,23 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Module extends Model
 {
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'module';
+  use SoftDeletes;
+  
+  /**
+   * The attributes that are mass assignable.
+   *
+   * @var array
+   */
+  protected $fillable = [
+    'lesson_id',
+    'quiz_id',
+    'title',
+    'description',
+    'order',
+    'status',
+  ];
 }

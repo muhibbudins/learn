@@ -13,18 +13,19 @@ class CreateModuleTable extends Migration
      */
     public function up()
     {
-        Schema::create('module', function (Blueprint $table) {
+        Schema::create('modules', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('lesson_id');
             $table->unsignedBigInteger('quiz_id');
             $table->string('title');
-            $table->string('description');
+            $table->string('description')->default('');
             $table->integer('order');
-            $table->boolean('status');
+            $table->boolean('status')->default(false);
             $table->timestamps();
+            $table->softDeletes();
 
-            $table->foreign('lesson_id')->references('id')->on('module_lesson');
-            $table->foreign('quiz_id')->references('id')->on('module_quiz');
+            $table->foreign('lesson_id')->references('id')->on('module_lessons');
+            $table->foreign('quiz_id')->references('id')->on('module_quizzes');
         });
     }
 
@@ -35,6 +36,6 @@ class CreateModuleTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('module');
+        Schema::dropIfExists('modules');
     }
 }

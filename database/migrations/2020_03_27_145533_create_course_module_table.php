@@ -13,16 +13,17 @@ class CreateCourseModuleTable extends Migration
      */
     public function up()
     {
-        Schema::create('course_module', function (Blueprint $table) {
+        Schema::create('course_modules', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('module_id');
             $table->unsignedBigInteger('course_id');
-            $table->integer('order');
-            $table->boolean('status');
+            $table->integer('order')->default(0);
+            $table->boolean('status')->default(false);
             $table->timestamps();
+            $table->softDeletes();
 
-            $table->foreign('module_id')->references('id')->on('module');
-            $table->foreign('course_id')->references('id')->on('course');
+            $table->foreign('module_id')->references('id')->on('modules');
+            $table->foreign('course_id')->references('id')->on('courses');
         });
     }
 
@@ -33,6 +34,6 @@ class CreateCourseModuleTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('course_module');
+        Schema::dropIfExists('course_modules');
     }
 }

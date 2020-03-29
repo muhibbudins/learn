@@ -3,13 +3,20 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CourseHistory extends Model
 {
+    use SoftDeletes;
+
     /**
-     * The table associated with the model.
+     * The attributes that are mass assignable.
      *
-     * @var string
+     * @var array
      */
-    protected $table = 'course_history';
+    protected $fillable = [
+        'module_id',
+        'course_id',
+        'completed',
+    ];
 }
