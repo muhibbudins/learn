@@ -12,12 +12,17 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::prefix('v1')->group(function () {
-    Route::post('register', 'Api\UserController@register');
-    Route::post('login', 'Api\UserController@login');
+Route::middleware(['cors'])->prefix('v1')->group(function () {
+    Route::post('register', 'AuthController@register');
+    Route::post('login', 'AuthController@login');
+    Route::get('refresh', 'AuthController@refresh');
+    Route::group(['middleware' => 'auth:api'], function(){
+        Route::get('me', 'Api\UserController@me');
+        Route::post('logout', 'AuthController@logout');
+    });
 });
 
-Route::middleware(['auth.roles:admin,lecturer,student'])->prefix('v1')->group(function () {
+Route::middleware(['is_admin'])->prefix('v1')->group(function () {
     Route::get('course', 'Api\CourseController@all');
     Route::get('course/history', 'Api\CourseHistoryController@all');
     Route::get('course/module', 'Api\CourseModuleController@all');
@@ -31,7 +36,7 @@ Route::middleware(['auth.roles:admin,lecturer,student'])->prefix('v1')->group(fu
     Route::get('user/course', 'Api\UserCourseController@all');
 });
 
-Route::middleware(['auth.roles:admin,lecturer'])->prefix('v1')->group(function () {
+Route::middleware(['is_admin'])->prefix('v1')->group(function () {
     Route::post('course', 'Api\CourseController@create');
     Route::post('course/history', 'Api\CourseHistoryController@create');
     Route::post('course/module', 'Api\CourseModuleController@create');
@@ -60,7 +65,7 @@ Route::middleware(['auth.roles:admin,lecturer'])->prefix('v1')->group(function (
     Route::delete('module/quiz/choice', 'Api\ModuleQuizChoiceController@delete');
 });
 
-Route::middleware(['auth.roles:admin'])->prefix('v1')->group(function () {
+Route::middleware(['is_admin'])->prefix('v1')->group(function () {
     Route::post('user', 'Api\UserController@create');
     Route::post('user/course', 'Api\UserCourseController@create');
 
@@ -69,8 +74,4 @@ Route::middleware(['auth.roles:admin'])->prefix('v1')->group(function () {
 
     Route::delete('user', 'Api\UserController@delete');
     Route::delete('user/course', 'Api\UserCourseController@delete');
-});
-
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
 });

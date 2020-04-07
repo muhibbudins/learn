@@ -7,16 +7,16 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CourseHistory extends Model
 {
-    use SoftDeletes;
+  use SoftDeletes;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'module_id',
-        'course_id',
-        'completed',
-    ];
+  /**
+   * The attributes that are mass assignable.
+   *
+   * @var array
+   */
+  protected $fillable = [
+    'module_id',
+    'course_id',
+    'completed',
+  ];
 }
