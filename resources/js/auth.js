@@ -1,15 +1,14 @@
-const bearer = require("@websanova/vue-auth/drivers/auth/bearer");
-const axios = require("@websanova/vue-auth/drivers/http/axios.1.x");
-const router = require("@websanova/vue-auth/drivers/router/vue-router.2.x");
+import bearer from "@websanova/vue-auth/drivers/auth/bearer";
+import axios from "@websanova/vue-auth/drivers/http/axios.1.x";
+import router from "@websanova/vue-auth/drivers/router/vue-router.2.x";
 // Auth base configuration some of this options
 // can be override in method calls
 const config = {
   auth: bearer,
   http: axios,
   router: router,
-  tokenDefaultName: "laravel-vue-spa",
-  tokenStore: ["localStorage"],
-  rolesVar: "role",
+  tokenDefaultName: "e-learning",
+  rolesKey: "role",
   registerData: { url: "v1/register", method: "POST", redirect: "/login" },
   loginData: {
     url: "v1/login",
@@ -31,4 +30,4 @@ const config = {
     interval: 30
   }
 };
-module.exports = config;
+export default config;

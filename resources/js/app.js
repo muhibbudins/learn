@@ -4,17 +4,17 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 
-require("es6-promise/auto");
-require("./bootstrap");
+import "es6-promise/auto"
+import "./bootstrap"
 
-const axios = require("axios");
-const Vue = require("vue");
-const VueAuth = require("@websanova/vue-auth");
-const VueAxios = require("vue-axios");
-const VueRouter = require("vue-router").default;
-const Index = require("./Index").default;
-const auth = require("./auth");
-const router = require("./router");
+import axios from "axios"
+import Vue from "vue"
+import VueAuth from "@websanova/vue-auth"
+import VueAxios from "vue-axios"
+import VueRouter from "vue-router"
+import Index from "./Index"
+import auth from "./auth"
+import router from "./router"
 
 // Set Vue globally
 window.Vue = Vue;
@@ -50,7 +50,7 @@ Vue.component("index", Index);
  * the page. Then, you may begin adding components to this application
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
-const app = new Vue({
+new Vue({
   el: "#app",
   router
 });

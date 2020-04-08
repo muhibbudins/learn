@@ -19,9 +19,13 @@ export default {
     //
   },
   mounted() {
-    if (this.$auth && this.$auth.user().role === "admin") {
-      this.$router.push({ name: "dashboard" });
-    }
+    this.$auth.load().then(() => {
+      const { role } = this.$auth.check() && this.$auth.user()
+
+      if (role === "admin") {
+        this.$router.push({ name: "dashboard" });
+      }
+    })
   }
 };
 </script>

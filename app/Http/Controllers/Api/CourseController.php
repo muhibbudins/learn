@@ -28,10 +28,7 @@ class CourseController extends Controller
             $courses = Course::paginate(30);
         }
 
-        return response()->json([
-            'trashed' => $trashed,
-            'courses' => $courses
-        ]);
+        return response()->json($courses);
     }
 
     public function create(Request $request) {
@@ -54,9 +51,8 @@ class CourseController extends Controller
         return response()->json($course, 201);
     }
     
-    public function update(Request $request) {
+    public function update(Request $request, $entity) {
         $validator = Validator::make($request->all(), [
-            'id' => 'required|string',
             'title' => 'string|max:200',
             'description' => 'string|max:255',
             'content' => 'string',
@@ -66,40 +62,38 @@ class CourseController extends Controller
             return response()->json($validator->errors(), 400);
         }
 
-        $courseTrashed = Course::onlyTrashed()->where('id', $request->get('id'))->count();
+        $courseTrashed = Course::onlyTrashed()->where('id', $entity)->count();
 
         if ($courseTrashed > 0) {
             return response()->json([
                 'message' => 'Course already deleted',
-                'entity' => $request->get('id')
+                'entity' => $entity
             ], 400);
         }
 
-        Course::where('id', $request->get('id'))->update([
+        Course::where('id', $entity)->update([
             'title' => $request->get('title'),
             'description' => $request->get('description'),
             'content' => $request->get('content'),
         ]);
 
-        $course = Course::find($request->get('id'));
+        $course = Course::find($entity);
 
         return response()->json($course, 200);
     }
 
-    public function delete(Request $request) {
-        $validator = Validator::make($request->all(), [
-            'id' => 'required|string',
-        ]);
-
-        if($validator->fails()){
-            return response()->json($validator->errors(), 400);
+    public function delete(Request $request, $entity) {
+        if(!$entity){
+            return response()->json([
+                'message' => 'Entity data is not defined'
+            ], 400);
         }
 
-        Course::where('id', $request->get('id'))->delete();
+        Course::where('id', $entity)->delete();
 
         return response()->json([
             'message' => 'Course already deleted',
-            'entity' => $request->get('id')
+            'entity' => $entity
         ], 200);
     }
 }

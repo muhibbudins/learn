@@ -19,19 +19,15 @@
       <div class="navbar-nav ml-auto">
         <div
           v-for="(route, key) in routes[
-            $auth.check('admin') ? 'admin' : 'general'
+            $auth.check('admin')
+              ? 'admin'
+              : $auth.check()
+              ? 'student'
+              : 'general'
           ]"
           v-bind:key="route.path"
         >
-          <div
-            class="nav-item"
-            :class="{
-              'd-none':
-                !$auth.check('admin') &&
-                (route.auth && !$auth.check()) ||
-                ($auth.check() && route.auth === false)
-            }"
-          >
+          <div class="nav-item">
             <router-link
               v-if="route.path"
               class="nav-link"
@@ -41,10 +37,10 @@
               {{ route.name }}
             </router-link>
             <a
-              v-else-if="route.action"
+              v-else-if="route.logout"
               class="nav-link"
               href="#"
-              @click.prevent="route.action()"
+              @click="loggingOut"
             >
               {{ route.name }}
             </a>
@@ -59,6 +55,7 @@
 export default {
   data() {
     return {
+      loginAs: false,
       routes: {
         admin: [
           {
@@ -78,11 +75,15 @@ export default {
             path: "dashboard-user"
           },
           {
+            name: "Profile",
+            path: "profile"
+          },
+          {
             name: "Logout",
-            action: this.$auth.logout
+            logout: true
           }
         ],
-        general: [
+        student: [
           {
             name: "Home",
             path: "home"
@@ -92,6 +93,21 @@ export default {
             path: "courses",
             auth: true
           },
+          {
+            name: "Profile",
+            path: "profile"
+          },
+          {
+            name: "Logout",
+            logout: true,
+            auth: true
+          }
+        ],
+        general: [
+          {
+            name: "Home",
+            path: "home"
+          },
           // {
           //   name: "Register",
           //   path: "register"
@@ -100,18 +116,18 @@ export default {
             name: "Login",
             path: "login",
             auth: false
-          },
-          {
-            name: "Logout",
-            action: this.$auth.logout,
-            auth: true
           }
         ]
       }
     };
   },
-  mounted() {
-    //
+  methods: {
+    loggingOut() {
+      this.$auth.logout({
+        makeRequest: true,
+        redirect: { name: "login" }
+      });
+    }
   }
 };
 </script>
