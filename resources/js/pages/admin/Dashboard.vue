@@ -3,19 +3,19 @@
     <div class="card card-default">
       <div class="card-body">
         <h5>Admin Dashboard</h5>
-        <UserList />
+        <Report />
       </div>
     </div>
   </div>
 </template>
 <script>
-import UserList from "../../components/UserList.vue";
+import Report from "../../components/Report.vue";
 export default {
   mounted() {
     //
   },
   components: {
-    UserList
+    Report
   },
   mounted() {
   }

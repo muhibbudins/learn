@@ -12,6 +12,7 @@
         <div class="card card-default">
           <div class="card-body">
             <h5>Admin Dashboard</h5>
+            <ListCourse />
           </div>
         </div>
       </div>
@@ -20,9 +21,11 @@
 </template>
 <script>
 import Sidebar from "../../components/Sidebar.vue";
+import ListCourse from "../../components/ListCourse.vue";
 export default {
   components: {
-    Sidebar
+    Sidebar,
+    ListCourse
   },
   mounted() {
   }

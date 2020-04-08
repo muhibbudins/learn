@@ -16,7 +16,7 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <div class="navbar-nav mr-auto">
+      <div class="navbar-nav ml-auto">
         <div
           v-for="(route, key) in routes[
             $auth.check('admin') ? 'admin' : 'general'
