@@ -40,7 +40,8 @@
 								{
 									"key": "role",
 									"value": "admin",
-									"type": "text"
+									"type": "text",
+									"disabled": true
 								}
 							]
 						},
@@ -59,7 +60,7 @@
 					"response": []
 				},
 				{
-					"name": "Login",
+					"name": "Login - Administrator",
 					"request": {
 						"method": "POST",
 						"header": [],
@@ -68,12 +69,46 @@
 							"formdata": [
 								{
 									"key": "email",
-									"value": "muhibbudins@e-learning.com",
+									"value": "admin@e-learning.com",
 									"type": "text"
 								},
 								{
 									"key": "password",
-									"value": "123123",
+									"value": "admin",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/login",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login - Student",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "student@e-learning.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "student",
 									"type": "text"
 								}
 							]
@@ -96,10 +131,10 @@
 			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "Master",
+			"name": "Frontend",
 			"item": [
 				{
-					"name": "Course - List",
+					"name": "Me",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -114,7 +149,36 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/v1/course?trashed=1",
+							"raw": "{{host}}/api/v1/me",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Course",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/course",
 							"host": [
 								"{{host}}"
 							],
@@ -126,15 +190,16 @@
 							"query": [
 								{
 									"key": "trashed",
-									"value": "1"
-								},
-								{
-									"key": "id",
 									"value": "1",
 									"disabled": true
 								},
 								{
-									"key": "in",
+									"key": "entity",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "includes",
 									"value": "1,2,3,4",
 									"disabled": true
 								}
@@ -144,7 +209,390 @@
 					"response": []
 				},
 				{
-					"name": "Course - Create",
+					"name": "Module",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/module",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"module"
+							],
+							"query": [
+								{
+									"key": "trashed",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "entity",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "includes",
+									"value": "1,2,3,4",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Module Lesson",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/module/lesson",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"module",
+								"lesson"
+							],
+							"query": [
+								{
+									"key": "trashed",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "entity",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "includes",
+									"value": "1,2,3,4",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Module Quiz",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/module/quiz",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"module",
+								"quiz"
+							],
+							"query": [
+								{
+									"key": "trashed",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "entity",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "includes",
+									"value": "1,2,3,4",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Module Quiz Choice",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/module/quiz/choice",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"module",
+								"quiz",
+								"choice"
+							],
+							"query": [
+								{
+									"key": "trashed",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "entity",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "includes",
+									"value": "1,2,3,4",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/user",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"user"
+							],
+							"query": [
+								{
+									"key": "trashed",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "entity",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "includes",
+									"value": "1,2,3,4",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Course",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/user/course",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"course"
+							],
+							"query": [
+								{
+									"key": "trashed",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "entity",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "includes",
+									"value": "1,2,3,4",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Course Module",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/user/course/module",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"course",
+								"module"
+							],
+							"query": [
+								{
+									"key": "trashed",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "entity",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "includes",
+									"value": "1,2,3,4",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Course Quiz",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/user/course/quiz",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"course",
+								"quiz"
+							],
+							"query": [
+								{
+									"key": "trashed",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "entity",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "includes",
+									"value": "1,2,3,4",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Master",
+			"item": [
+				{
+					"name": "Create - Course",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -164,16 +612,19 @@
 								{
 									"key": "title",
 									"value": "Course 1",
+									"description": "Title of course",
 									"type": "text"
 								},
 								{
 									"key": "description",
-									"value": "Course 1 description",
+									"value": "This is an example of course description",
+									"description": "Short description about the course",
 									"type": "text"
 								},
 								{
 									"key": "content",
-									"value": "Couse 1 content",
+									"value": "In this course you will be learn bla bla bla ...",
+									"description": "Full content of the course",
 									"type": "text"
 								}
 							]
@@ -193,7 +644,7 @@
 					"response": []
 				},
 				{
-					"name": "Course - Update",
+					"name": "Create - Module",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -211,43 +662,433 @@
 							"mode": "formdata",
 							"formdata": [
 								{
-									"key": "id",
-									"value": "3",
+									"key": "course_id",
+									"value": "1",
+									"description": "Course Id",
+									"type": "text"
+								},
+								{
+									"key": "module_lesson_id",
+									"value": "1",
+									"description": "Lesson Id",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "module_quiz_id",
+									"value": "1",
+									"description": "Quiz Id",
 									"type": "text"
 								},
 								{
 									"key": "title",
-									"value": "Course 3",
+									"value": "Module 2 title",
+									"description": "Title of the module",
 									"type": "text"
 								},
 								{
 									"key": "description",
-									"value": "Course 3 description",
-									"type": "text"
-								},
-								{
-									"key": "content",
-									"value": "Couse 3 content",
+									"value": "We will learn about module 2",
+									"description": "Short description about the module",
 									"type": "text"
 								}
 							]
 						},
 						"url": {
-							"raw": "{{host}}/api/v1/course",
+							"raw": "{{host}}/api/v1/module",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"api",
 								"v1",
-								"course"
+								"module"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Course - Delete",
+					"name": "Create - Module Lesson",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Lesson 1",
+									"description": "Title of the lesson",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "In this lesson we will learn bla bla",
+									"description": "Short description or notes",
+									"type": "text"
+								},
+								{
+									"key": "content",
+									"value": "Lesson 1 will teach you something in this course ",
+									"description": "Full content of the lesson",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/module/lesson",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"module",
+								"lesson"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create - Module Quiz",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Quiz 1",
+									"description": "Title of the quiz",
+									"type": "text"
+								},
+								{
+									"key": "content",
+									"value": "This is an example for quiz one",
+									"description": "Content of the quiz",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/module/quiz",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"module",
+								"quiz"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create - Module Quiz Choice",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "module_quiz_id",
+									"value": "1",
+									"description": "Parent quiz ID",
+									"type": "text"
+								},
+								{
+									"key": "content",
+									"value": "Answer 3",
+									"description": "Content of the answer",
+									"type": "text"
+								},
+								{
+									"key": "answer",
+									"value": "0",
+									"description": "Is this the answer or not (0 ir 1)",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/module/quiz/choice",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"module",
+								"quiz",
+								"choice"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create - User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "sample",
+									"description": "Username of user",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "sample@user.co",
+									"description": "Valid email of user",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "123123",
+									"description": "Password",
+									"type": "text"
+								},
+								{
+									"key": "password_confirmation",
+									"value": "123123",
+									"description": "Confirm Password",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/user",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create - User Course",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "course_id",
+									"value": "1",
+									"description": "Course Id",
+									"type": "text"
+								},
+								{
+									"key": "user_id",
+									"value": "3",
+									"description": "User Id",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/user/course",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"course"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "3",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create - User Course Module",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "user_course_id",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "module_id",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "completed",
+									"value": "0",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/user/course/module",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"course",
+								"module"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create - User Course Quiz",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "user_course_id",
+									"value": "1",
+									"description": "User id",
+									"type": "text"
+								},
+								{
+									"key": "module_quiz_id",
+									"value": "1",
+									"description": "Quiz Id",
+									"type": "text"
+								},
+								{
+									"key": "module_quiz_choice_id",
+									"value": "1",
+									"description": "Answer of quiz, or can fill with essay below",
+									"type": "text"
+								},
+								{
+									"key": "essay",
+									"value": "",
+									"description": "Fill this if user quiz have essay answer",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/user/course/quiz",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"course",
+								"quiz"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete - Course",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -266,31 +1107,228 @@
 							"formdata": []
 						},
 						"url": {
-							"raw": "{{host}}/api/v1/course?id=2",
+							"raw": "{{host}}/api/v1/course/delete/2",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"api",
 								"v1",
-								"course"
-							],
-							"query": [
+								"course",
+								"delete",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete - Module",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "id",
-									"value": "2"
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
 								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/course/4",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"course",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete - Module Lesson",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/course/4",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"course",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete - Module Quiz",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/course/4",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"course",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete - Module Quiz Choice",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/course/4",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"course",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete - User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/user/5",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete - User Course",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/user/course/delete/1",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"course",
+								"delete",
+								"1"
 							]
 						}
 					},
 					"response": []
 				}
 			],
-			"protocolProfileBehavior": {}
-		},
-		{
-			"name": "Frontend",
-			"item": [],
 			"protocolProfileBehavior": {}
 		}
 	],
