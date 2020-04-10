@@ -15,8 +15,23 @@ class UserCourse extends Model
    * @var array
    */
   protected $fillable = [
-    'user_id',
     'course_id',
-    'status',
+    'user_id',
   ];
+
+  /**
+   * Get the course for the user course.
+   */
+  public function course()
+  {
+      return $this->belongsTo('App\Course');
+  }
+
+  /**
+   * Get the user for the user course.
+   */
+  public function user()
+  {
+      return $this->belongsTo('App\User');
+  }
 }

@@ -20,7 +20,11 @@ class VerifyIsAdmin
             return $next($request);
         }
         else {
-            return response()->json(['error' => 'Unauthorized'], 403);
+            return response()->json([
+                'error' => true,
+                'message' => 'Failed to grant access, you can\'t access this route',
+                'data' => []
+            ], 401);
         }
     }
 }

@@ -16,9 +16,6 @@ class CreateModuleQuizTable extends Migration
         Schema::create('module_quizzes', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('title');
-            $table->string('description')->default('');
-            $table->integer('order')->default(0);
-            $table->integer('answer');
             $table->text('content');
             $table->boolean('status')->default(false);
             $table->timestamps();

@@ -2,100 +2,178 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\UserCourse;
+
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+
 class UserCourseController extends Controller
 {
-    public function all(Request $request) {
-        $id = $request->get('id');
-        $in = $request->get('in');
+    public function read(Request $request) {
+        $entity = $request->get('entity');
+        $includes = $request->get('includes');
         $trashed = $request->get('trashed');
 
-        if ($id || $in) {
-            $courses = Course::find($id ?? explode(',', $in));
-        }
+        try {
+            // Force get only user data when access role not admin
+            if (Auth::user()->role !== 'admin') {
+                $userCourses = [];
+                $userCourseData = UserCourse::where('user_id', Auth::user()->id)->get();
 
-        else if ($trashed) {
-            $courses = Course::onlyTrashed()->paginate(30);
+                foreach ($userCourseData as $userCourse) {
+                    $userCourse['course'] = $userCourse->course;
+                    $userCourses[] = $userCourse;
+                }
+            } else {
+                if ($entity) {
+                    $userCourses = UserCourse::find($entity);
+                    $userCourses['user'] = $userCourses->user;
+                    $userCourses['course'] = $userCourses->course;
+                }
+                else if ($includes) {
+                    $userCourses = [];
+                    $userCourseData = UserCourse::find(explode(',', $includes));
+    
+                    foreach ($userCourseData as $userCourse) {
+                        $userCourse['user'] = $userCourse->user;
+                        $userCourse['course'] = $userCourse->course;
+                        $userCourses[] = $userCourse;
+                    }
+                }
+                else if ($trashed) {
+                    $userCourses = UserCourse::onlyTrashed()->paginate(30);
+                }
+                else {
+                    $userCourses = UserCourse::paginate(30);
+                }
+            }
+    
+            return response()->json($userCourses, 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error'   => true,
+                'message' => 'Something went wrong when reading a user course',
+                'data'    => []
+            ], 500);
         }
-
-        else {
-            $courses = Course::paginate(30);
-        }
-
-        return response()->json([
-            'trashed' => $trashed,
-            'courses' => $courses
-        ]);
     }
 
     public function create(Request $request) {
         $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:200',
-            'description' => 'required|string|max:255',
-            'content' => 'required|string',
+            'user_id' => 'required|string',
+            'course_id' => 'required|string',
         ]);
 
         if($validator->fails()){
-            return response()->json($validator->errors(), 400);
-        }
-
-        $course = Course::create([
-            'title' => $request->get('title'),
-            'description' => $request->get('description'),
-            'content' => $request->get('content'),
-        ]);
-
-        return response()->json($course, 201);
-    }
-    
-    public function update(Request $request) {
-        $validator = Validator::make($request->all(), [
-            'id' => 'required|string',
-            'title' => 'string|max:200',
-            'description' => 'string|max:255',
-            'content' => 'string',
-        ]);
-
-        if($validator->fails()){
-            return response()->json($validator->errors(), 400);
-        }
-
-        $courseTrashed = Course::onlyTrashed()->where('id', $request->get('id'))->count();
-
-        if ($courseTrashed > 0) {
             return response()->json([
-                'message' => 'Course already deleted',
-                'entity' => $request->get('id')
+                'error' => true,
+                'messages' => $validator->errors(),
+                'data' => $request->all(),
             ], 400);
         }
 
-        Course::where('id', $request->get('id'))->update([
-            'title' => $request->get('title'),
-            'description' => $request->get('description'),
-            'content' => $request->get('content'),
-        ]);
-
-        $course = Course::find($request->get('id'));
-
-        return response()->json($course, 200);
+        try {
+            $userCourse = UserCourse::create([
+                'user_id' => $request->get('user_id'),
+                'course_id' => $request->get('course_id')
+            ]);
+    
+            return response()->json([
+                'error'   => false,
+                'message' => 'Successfully creating a user course',
+                'data'    => $userCourse
+            ], 201);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error'   => true,
+                'message' => 'Something went wrong when creating a user course',
+                'data'    => []
+            ], 500);
+        }
     }
-
-    public function delete(Request $request) {
+    
+    public function update(Request $request, $entity) {
         $validator = Validator::make($request->all(), [
-            'id' => 'required|string',
+            'user_id' => 'string',
+            'course_id' => 'string',
         ]);
 
         if($validator->fails()){
-            return response()->json($validator->errors(), 400);
+            return response()->json([
+                'error' => true,
+                'messages' => $validator->errors(),
+                'data' => $request->all(),
+            ], 400);
         }
 
-        Course::where('id', $request->get('id'))->delete();
+        try {
+            $userCourseTrashed = UserCourse::onlyTrashed()->where('id', $entity)->count();
 
-        return response()->json([
-            'message' => 'Course already deleted',
-            'entity' => $request->get('id')
-        ], 200);
+            if ($userCourseTrashed > 0) {
+                return response()->json([
+                    'error'   => true,
+                    'message' => 'Course already deleted',
+                    'data'    => [
+                        'entity' => $entity
+                    ]
+                ], 400);
+            }
+    
+            $userCourseData = UserCourse::find($entity);
+
+            if ($request->get('user_id')) {
+                $userCourseData->user_id = $request->get('user_id');
+            }
+            if ($request->get('course_id')) {
+                $userCourseData->course_id = $request->get('course_id');
+            }
+
+            $userCourseData->save();
+    
+            return response()->json([
+                'error'   => false,
+                'message' => 'Successfully updating a user course',
+                'data'    => $userCourseData
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error'   => true,
+                'message' => 'Something went wrong when updating a user course',
+                'data'    => []
+            ], 500);
+        }
+    }
+
+    public function delete(Request $request, $entity) {
+        try {
+            $userCourseData = UserCourse::find($entity);
+
+            if (!$userCourseData) {
+                return response()->json([
+                    'error'   => true,
+                    'message' => 'Entity data is not defined',
+                    'data'    => []
+                ], 400);
+            }
+            
+            $userCourseData->delete();
+
+            return response()->json([
+                'error'   => false,
+                'message' => 'Course already deleted',
+                'data'    => [
+                    'entity' => $entity
+                ]
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error'   => true,
+                'message' => 'Something went wrong when deleting a user course',
+                'data'    => []
+            ], 500);
+        }
     }
 }

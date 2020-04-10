@@ -11,24 +11,42 @@ use Illuminate\Support\Facades\Validator;
 
 class CourseController extends Controller
 {
-    public function all(Request $request) {
-        $id = $request->get('id');
-        $in = $request->get('in');
+    public function read(Request $request) {
+        $entity = $request->get('entity');
+        $includes = $request->get('includes');
         $trashed = $request->get('trashed');
 
-        if ($id || $in) {
-            $courses = Course::find($id ?? explode(',', $in));
-        }
+        try {
+            if ($entity) {
+                $courses = Course::find($entity);
+                $courses['modules'] = $courses->modules;
+                $courses['users'] = $courses->users;
+            }
+            else if ($includes) {
+                $courses = [];
+                $courseData = Course::find(explode(',', $includes));
 
-        else if ($trashed) {
-            $courses = Course::onlyTrashed()->paginate(30);
+                foreach ($courseData as $course) {
+                    $course['modules'] = $course->modules;
+                    $courses[] = $course;
+                }
+            }
+            else if ($trashed) {
+                $courses = Course::onlyTrashed()->paginate(30);
+            }
+    
+            else {
+                $courses = Course::paginate(30);
+            }
+    
+            return response()->json($courses, 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error'   => true,
+                'message' => 'Something went wrong when reading a course',
+                'data'    => []
+            ], 500);
         }
-
-        else {
-            $courses = Course::paginate(30);
-        }
-
-        return response()->json($courses);
     }
 
     public function create(Request $request) {
@@ -39,16 +57,32 @@ class CourseController extends Controller
         ]);
 
         if($validator->fails()){
-            return response()->json($validator->errors(), 400);
+            return response()->json([
+                'error' => true,
+                'messages' => $validator->errors(),
+                'data' => $request->all(),
+            ], 400);
         }
 
-        $course = Course::create([
-            'title' => $request->get('title'),
-            'description' => $request->get('description'),
-            'content' => $request->get('content'),
-        ]);
-
-        return response()->json($course, 201);
+        try {
+            $course = Course::create([
+                'title' => $request->get('title'),
+                'description' => $request->get('description'),
+                'content' => $request->get('content'),
+            ]);
+    
+            return response()->json([
+                'error'   => false,
+                'message' => 'Successfully creating a course',
+                'data'    => $course
+            ], 201);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error'   => true,
+                'message' => 'Something went wrong when creating a course',
+                'data'    => []
+            ], 500);
+        }
     }
     
     public function update(Request $request, $entity) {
@@ -59,41 +93,81 @@ class CourseController extends Controller
         ]);
 
         if($validator->fails()){
-            return response()->json($validator->errors(), 400);
-        }
-
-        $courseTrashed = Course::onlyTrashed()->where('id', $entity)->count();
-
-        if ($courseTrashed > 0) {
             return response()->json([
-                'message' => 'Course already deleted',
-                'entity' => $entity
+                'error' => true,
+                'messages' => $validator->errors(),
+                'data' => $request->all(),
             ], 400);
         }
 
-        Course::where('id', $entity)->update([
-            'title' => $request->get('title'),
-            'description' => $request->get('description'),
-            'content' => $request->get('content'),
-        ]);
+        try {
+            $courseTrashed = Course::onlyTrashed()->where('id', $entity)->count();
 
-        $course = Course::find($entity);
+            if ($courseTrashed > 0) {
+                return response()->json([
+                    'error'   => true,
+                    'message' => 'Course already deleted',
+                    'data'    => [
+                        'entity' => $entity
+                    ]
+                ], 400);
+            }
+    
+            $courseData = Course::find($entity);
 
-        return response()->json($course, 200);
+            if ($request->get('title')) {
+                $courseData->title = $request->get('title');
+            }
+            if ($request->get('description')) {
+                $courseData->description = $request->get('description');
+            }
+            if ($request->get('content')) {
+                $courseData->content = $request->get('content');
+            }
+
+            $courseData->save();
+    
+            return response()->json([
+                'error'   => false,
+                'message' => 'Successfully updating a course',
+                'data'    => $courseData
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error'   => true,
+                'message' => 'Something went wrong when updating a course',
+                'data'    => []
+            ], 500);
+        }
     }
 
     public function delete(Request $request, $entity) {
-        if(!$entity){
+        try {
+            $courseData = Course::find($entity);
+
+            if (!$courseData) {
+                return response()->json([
+                    'error'   => true,
+                    'message' => 'Entity data is not defined',
+                    'data'    => []
+                ], 400);
+            }
+            
+            $courseData->delete();
+
             return response()->json([
-                'message' => 'Entity data is not defined'
-            ], 400);
+                'error'   => false,
+                'message' => 'Course already deleted',
+                'data'    => [
+                    'entity' => $entity
+                ]
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error'   => true,
+                'message' => 'Something went wrong when deleting a course',
+                'data'    => []
+            ], 500);
         }
-
-        Course::where('id', $entity)->delete();
-
-        return response()->json([
-            'message' => 'Course already deleted',
-            'entity' => $entity
-        ], 200);
     }
 }

@@ -15,8 +15,17 @@ class ModuleQuizChoices extends Model
    * @var array
    */
   protected $fillable = [
-    'quiz_id',
+    'module_quiz_id',
     'content',
-    'order',
+    'answer',
+  ];
+
+  /**
+   * The attributes that should be hidden for arrays.
+   *
+   * @var array
+   */
+  protected $hidden = [
+    'answer',
   ];
 }

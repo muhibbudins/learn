@@ -15,11 +15,27 @@ class Module extends Model
    * @var array
    */
   protected $fillable = [
-    'lesson_id',
-    'quiz_id',
+    'course_id',
+    'module_lesson_id',
+    'module_quiz_id',
     'title',
     'description',
-    'order',
     'status',
   ];
+
+  /**
+   * Get the lessons for the module.
+   */
+  public function lessons()
+  {
+      return $this->hasMany('App\ModuleLesson');
+  }
+
+  /**
+   * Get the quizzes for the module.
+   */
+  public function quizzes()
+  {
+      return $this->hasMany('App\ModuleQuiz');
+  }
 }

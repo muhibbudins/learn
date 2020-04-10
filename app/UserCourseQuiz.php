@@ -5,7 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class CourseModule extends Model
+class UserCourseQuiz extends Model
 {
   use SoftDeletes;
   
@@ -15,9 +15,9 @@ class CourseModule extends Model
    * @var array
    */
   protected $fillable = [
-    'module_id',
-    'course_id',
-    'order',
-    'status',
+    'user_course_id',
+    'module_quiz_id',
+    'module_quiz_choice_id',
+    'essay',
   ];
 }

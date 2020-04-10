@@ -15,17 +15,18 @@ class CreateModuleTable extends Migration
     {
         Schema::create('modules', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('lesson_id');
-            $table->unsignedBigInteger('quiz_id');
+            $table->unsignedBigInteger('course_id');
+            $table->unsignedBigInteger('module_lesson_id')->nullable();
+            $table->unsignedBigInteger('module_quiz_id')->nullable();
             $table->string('title');
             $table->string('description')->default('');
-            $table->integer('order');
             $table->boolean('status')->default(false);
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('lesson_id')->references('id')->on('module_lessons');
-            $table->foreign('quiz_id')->references('id')->on('module_quizzes');
+            $table->foreign('course_id')->references('id')->on('courses');
+            $table->foreign('module_lesson_id')->references('id')->on('module_lessons');
+            $table->foreign('module_quiz_id')->references('id')->on('module_quizzes');
         });
     }
 

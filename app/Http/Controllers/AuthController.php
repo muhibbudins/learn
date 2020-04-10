@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
@@ -16,28 +17,41 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string',
-            'email' => 'required|email|unique:users',
-            'password'  => 'required|min:3|confirmed',
+            'name'     => 'required|string',
+            'email'    => 'required|email|unique:users',
+            'password' => 'required|min:3|confirmed',
         ]);
 
-        if ($validator->fails())
-        {
+        if ($validator->fails()) {
             return response()->json([
-                'status' => 'error',
-                'errors' => $validator->errors()
+                'error'   => true,
+                'message' => $validator->errors(),
+                'data'    => []
             ], 422);
         }
 
-        $user = new User;
+        try {
+            $user = User::create([
+                'name' => $request->get('name'),
+                'email' => $request->get('email'),
+                'password' => Hash::make($request->get('password')),
+            ]);
 
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->password = bcrypt($request->password);
-
-        $user->save();
-
-        return response()->json(['status' => 'success'], 200);
+            return response()->json([
+                'error'   => false,
+                'message' => 'Your account already created',
+                'data'    => [
+                    'name'  => $request->get('name'),
+                    'email' => $request->get('email'),
+                ]
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error'   => true,
+                'message' => 'Something went wrong at our server',
+                'data'    => []
+            ], 500);
+        }
     }
     
     /**
@@ -49,14 +63,32 @@ class AuthController extends Controller
     {
         $credentials = $request->only('email', 'password');
 
-        if ($token = $this->guard()->attempt($credentials)) {
-            return response()
-                ->json(['status' => 'success'], 200)
-                ->header('Authorization', $token)
-            ;
+        try {
+            if ($token = $this->guard()->attempt($credentials)) {
+                return response()
+                    ->json([
+                        'error'   => false,
+                        'message' => 'Your login access already granted',
+                        'data'    => [
+                            'token'   => $token
+                        ]
+                    ], 200)
+                    ->header('Authorization', $token)
+                ;
+            }
+    
+            return response()->json([
+                'error'   => true,
+                'message' => 'Your credentials is invalid, please check you e-mail or password',
+                'data'    => []
+            ], 401);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error'   => true,
+                'message' => 'Something went wrong at our server',
+                'data'    => []
+            ], 500);
         }
-
-        return response()->json(['error' => 'login_error'], 401);
     }
     
     /**
@@ -69,8 +101,8 @@ class AuthController extends Controller
         $this->guard()->logout();
 
         return response()->json([
-            'status' => 'success',
-            'msg' => 'Logged out Successfully.'
+            'error' => false,
+            'message' => 'Successfully logging out from system'
         ], 200);
     }
     
@@ -83,12 +115,22 @@ class AuthController extends Controller
     {
         if ($token = $this->guard()->refresh()) {
             return response()
-                ->json(['status' => 'successs'], 200)
+                ->json([
+                    'error'   => false,
+                    'message' => 'Your token already refreshed',
+                    'data'    => [
+                        'token'   => $token
+                    ]
+                ], 200)
                 ->header('Authorization', $token)
             ;
         }
 
-        return response()->json(['error' => 'refresh_token_error'], 401);
+        return response()->json([
+            'error'   => true,
+            'message' => 'Your credentials is invalid, failed to refresh token',
+            'data'    => []
+        ], 401);
     }
 
     /**

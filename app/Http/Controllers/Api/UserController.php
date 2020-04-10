@@ -3,44 +3,204 @@
 namespace App\Http\Controllers\Api;
 
 use App\User;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Controller;
+
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
-    public function all()
-    {
-        $users = User::all();
-        return response()->json(
-            [
-                'status' => 'success',
-                'users' => $users->toArray()
-            ], 200);
-    }
-    
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
     public function me(Request $request)
     {
-        $user = User::find(Auth::user()->id);
+        $userData = User::find(Auth::user()->id);
+        $userData['courses'] = $userData->courses;
+
+        foreach ($userData['courses'] as $userCourse) {
+            $userCourse['course'] = $userCourse->course;
+        }
 
         return response()->json([
-            'status' => 'success',
-            'data' => $user
+            'error'   => false,
+            'message' => 'Successfully reading a user data',
+            'data'    => $userData,
         ]);
     }
 
-    public function show(Request $request, $id)
-    {
-        $user = User::find($id);
-        return response()->json(
-            [
-                'status' => 'success',
-                'user' => $user->toArray()
+    public function read(Request $request) {
+        $entity = $request->get('entity');
+        $includes = $request->get('includes');
+        $trashed = $request->get('trashed');
+
+        try {
+            // Force get only user data when access role not admin
+            if (Auth::user()->role !== 'admin') {
+                return response()->json(Auth::user(), 200);
+            }
+
+            if ($entity || $includes) {
+                $users = User::find($entity ?? explode(',', $includes));
+            }
+    
+            else if ($trashed) {
+                $users = User::onlyTrashed()->paginate(30);
+            }
+    
+            else {
+                $users = User::paginate(30);
+            }
+    
+            return response()->json($users, 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error'   => true,
+                'message' => 'Something went wrong when reading a user',
+                'data'    => []
+            ], 500);
+        }
+    }
+
+    public function create(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'name'     => 'required|string',
+            'email'    => 'required|email|unique:users',
+            'password' => 'required|min:3|confirmed',
+        ]);
+
+        if($validator->fails()){
+            return response()->json([
+                'error' => true,
+                'messages' => $validator->errors(),
+                'data' => $request->all(),
+            ], 400);
+        }
+
+        try {
+            $user = User::create([
+                'name' => $request->get('name'),
+                'email' => $request->get('email'),
+                'password' => Hash::make($request->get('password')),
+            ]);
+    
+            return response()->json([
+                'error'   => false,
+                'message' => 'Successfully creating a user',
+                'data'    => $user
+            ], 201);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error'   => true,
+                'message' => 'Something went wrong when creating a user',
+                'data'    => []
+            ], 500);
+        }
+    }
+    
+    public function update(Request $request, $entity) {
+        $validator = Validator::make($request->all(), [
+            'name' => 'string',
+            'email' => 'email|unique:users',
+            'password' => 'min:3|confirmed',
+            'role' => 'string',
+            'firstname' => 'string',
+            'lastname' => 'string',
+            'address' => 'string',
+            'status' => 'boolean',
+        ]);
+
+        if($validator->fails()){
+            return response()->json([
+                'error' => true,
+                'messages' => $validator->errors(),
+                'data' => $request->all(),
+            ], 400);
+        }
+
+        try {
+            $userTrashed = User::onlyTrashed()->where('id', $entity)->count();
+
+            if ($userTrashed > 0) {
+                return response()->json([
+                    'error'   => true,
+                    'message' => 'User already deleted',
+                    'data'    => [
+                        'entity' => $entity
+                    ]
+                ], 400);
+            }
+    
+            $userData = User::find($entity);
+
+            if ($request->get('name')) {
+                $userData->name = $request->get('name');
+            }
+            if ($request->get('email')) {
+                $userData->email = $request->get('email');
+            }
+            if ($request->get('password')) {
+                $userData->password = $request->get('password');
+            }
+            if ($request->get('role')) {
+                $userData->role = $request->get('role');
+            }
+            if ($request->get('firstname')) {
+                $userData->firstname = $request->get('firstname');
+            }
+            if ($request->get('lastname')) {
+                $userData->lastname = $request->get('lastname');
+            }
+            if ($request->get('address')) {
+                $userData->address = $request->get('address');
+            }
+            if ($request->get('status')) {
+                $userData->status = $request->get('status');
+            }
+
+            $userData->save();
+    
+            return response()->json([
+                'error'   => false,
+                'message' => 'Successfully updating a user',
+                'data'    => $userData
             ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error'   => true,
+                'message' => 'Something went wrong when updating a user',
+                'data'    => []
+            ], 500);
+        }
+    }
+
+    public function delete(Request $request, $entity) {
+        try {
+            $userData = User::find($entity);
+
+            if (!$userData) {
+                return response()->json([
+                    'error'   => true,
+                    'message' => 'Entity data is not defined',
+                    'data'    => []
+                ], 400);
+            }
+            
+            $userData->delete();
+
+            return response()->json([
+                'error'   => false,
+                'message' => 'User already deleted',
+                'data'    => [
+                    'entity' => $entity
+                ]
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error'   => true,
+                'message' => 'Something went wrong when deleting a user',
+                'data'    => []
+            ], 500);
+        }
     }
 }

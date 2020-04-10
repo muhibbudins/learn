@@ -16,10 +16,15 @@ class ModuleQuiz extends Model
    */
   protected $fillable = [
     'title',
-    'description',
-    'order',
-    'answer',
     'content',
     'status',
   ];
+
+  /**
+   * Get the choices for the quiz.
+   */
+  public function choices()
+  {
+      return $this->hasMany('App\ModuleQuizChoices');
+  }
 }

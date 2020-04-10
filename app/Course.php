@@ -20,4 +20,20 @@ class Course extends Model
     'content',
     'status',
   ];
+
+  /**
+   * Get the modules for the course.
+   */
+  public function modules()
+  {
+      return $this->hasMany('App\Module');
+  }
+
+  /**
+   * Get the user for the courses.
+   */
+  public function users()
+  {
+      return $this->hasMany('App\UserCourse');
+  }
 }

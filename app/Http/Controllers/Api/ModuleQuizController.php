@@ -2,100 +2,165 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\ModuleQuiz;
+
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
+use Illuminate\Support\Facades\Validator;
+
 class ModuleQuizController extends Controller
 {
-    public function all(Request $request) {
-        $id = $request->get('id');
-        $in = $request->get('in');
+    public function read(Request $request) {
+        $entity = $request->get('entity');
+        $includes = $request->get('includes');
         $trashed = $request->get('trashed');
 
-        if ($id || $in) {
-            $courses = Course::find($id ?? explode(',', $in));
-        }
+        try {
+            if ($entity) {
+                $moduleQuiz = ModuleQuiz::find($entity);
+                $moduleQuiz['choices'] = $moduleQuiz->choices;
+            }
+            else if ($trashed) {
+                $moduleQuiz = ModuleQuiz::onlyTrashed()->paginate(30);
+            }
+            else {
+                $moduleQuiz = [];
+                $quizData = ModuleQuiz::all();
 
-        else if ($trashed) {
-            $courses = Course::onlyTrashed()->paginate(30);
+                foreach ($quizData as $quiz) {
+                    $quiz['choices'] = $quiz->choices;
+                    $moduleQuiz[] = $quiz;
+                }
+            }
+    
+            return response()->json($moduleQuiz, 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error'   => true,
+                'message' => 'Something went wrong when reading a module quiz',
+                'data'    => []
+            ], 500);
         }
-
-        else {
-            $courses = Course::paginate(30);
-        }
-
-        return response()->json([
-            'trashed' => $trashed,
-            'courses' => $courses
-        ]);
     }
 
     public function create(Request $request) {
         $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:200',
-            'description' => 'required|string|max:255',
-            'content' => 'required|string',
+            'title' => 'required|string',
+            'content' => 'required|string'
         ]);
 
         if($validator->fails()){
-            return response()->json($validator->errors(), 400);
-        }
-
-        $course = Course::create([
-            'title' => $request->get('title'),
-            'description' => $request->get('description'),
-            'content' => $request->get('content'),
-        ]);
-
-        return response()->json($course, 201);
-    }
-    
-    public function update(Request $request) {
-        $validator = Validator::make($request->all(), [
-            'id' => 'required|string',
-            'title' => 'string|max:200',
-            'description' => 'string|max:255',
-            'content' => 'string',
-        ]);
-
-        if($validator->fails()){
-            return response()->json($validator->errors(), 400);
-        }
-
-        $courseTrashed = Course::onlyTrashed()->where('id', $request->get('id'))->count();
-
-        if ($courseTrashed > 0) {
             return response()->json([
-                'message' => 'Course already deleted',
-                'entity' => $request->get('id')
+                'error' => true,
+                'messages' => $validator->errors(),
+                'data' => $request->all(),
             ], 400);
         }
 
-        Course::where('id', $request->get('id'))->update([
-            'title' => $request->get('title'),
-            'description' => $request->get('description'),
-            'content' => $request->get('content'),
-        ]);
-
-        $course = Course::find($request->get('id'));
-
-        return response()->json($course, 200);
+        try {
+            $moduleQuiz = ModuleQuiz::create([
+                'title' => $request->get('title'),
+                'content' => $request->get('content'),
+            ]);
+    
+            return response()->json([
+                'error'   => false,
+                'message' => 'Successfully creating a module quiz',
+                'data'    => $moduleQuiz
+            ], 201);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error'   => true,
+                'message' => 'Something went wrong when creating a module quiz',
+                'data'    => []
+            ], 500);
+        }
     }
-
-    public function delete(Request $request) {
+    
+    public function update(Request $request, $entity) {
         $validator = Validator::make($request->all(), [
-            'id' => 'required|string',
+            'title' => 'string',
+            'content' => 'string',
+            'status' => 'string',
         ]);
 
         if($validator->fails()){
-            return response()->json($validator->errors(), 400);
+            return response()->json([
+                'error' => true,
+                'messages' => $validator->errors(),
+                'data' => $request->all(),
+            ], 400);
         }
 
-        Course::where('id', $request->get('id'))->delete();
+        try {
+            $moduleQuiz = ModuleQuiz::onlyTrashed()->where('id', $entity)->count();
 
-        return response()->json([
-            'message' => 'Course already deleted',
-            'entity' => $request->get('id')
-        ], 200);
+            if ($moduleQuiz > 0) {
+                return response()->json([
+                    'error'   => true,
+                    'message' => 'Modul quiz already deleted',
+                    'data'    => [
+                        'entity' => $entity
+                    ]
+                ], 400);
+            }
+    
+            $moduleQuiz = ModuleQuiz::find($entity);
+
+            if ($request->get('title')) {
+                $moduleQuiz->title = $request->get('title');
+            }
+            if ($request->get('content')) {
+                $moduleQuiz->content = $request->get('content');
+            }
+            if ($request->get('status')) {
+                $moduleQuiz->status = $request->get('status');
+            }
+
+            $moduleQuiz->save();
+    
+            return response()->json([
+                'error'   => false,
+                'message' => 'Successfully updating a module quiz',
+                'data'    => $moduleQuiz
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error'   => true,
+                'message' => 'Something went wrong when updating a module quiz',
+                'data'    => []
+            ], 500);
+        }
+    }
+
+    public function delete(Request $request, $entity) {
+        try {
+            $moduleQuiz = ModuleQuiz::find($entity);
+
+            if (!$moduleQuiz) {
+                return response()->json([
+                    'error'   => true,
+                    'message' => 'Entity data is not defined',
+                    'data'    => []
+                ], 400);
+            }
+            
+            $moduleQuiz->delete();
+
+            return response()->json([
+                'error'   => false,
+                'message' => 'Modul quiz already deleted',
+                'data'    => [
+                    'entity' => $entity
+                ]
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error'   => true,
+                'message' => 'Something went wrong when deleting a module quiz',
+                'data'    => []
+            ], 500);
+        }
     }
 }

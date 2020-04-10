@@ -49,6 +49,14 @@ class User extends Authenticatable implements JWTSubject
   ];
 
   /**
+   * Get the courses for the user.
+   */
+  public function courses()
+  {
+      return $this->hasMany('App\UserCourse');
+  }
+
+  /**
    * JWT Identifier
    */
   public function getJWTIdentifier()
