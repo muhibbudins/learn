@@ -20,8 +20,8 @@
   </div>
 </template>
 <script>
-import Sidebar from "../../components/Sidebar.vue";
-import ListCourse from "../../components/ListCourse.vue";
+import Sidebar from "../../components/admin/Sidebar.vue";
+import ListCourse from "../../components/admin/ListCourse.vue";
 export default {
   components: {
     Sidebar,

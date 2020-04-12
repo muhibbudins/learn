@@ -1,16 +1,17 @@
 const VueRouter = require("vue-router").default;
 
 // Pages
-const Home = require("./pages/Home").default;
-const Register = require("./pages/Register").default;
-const Login = require("./pages/Login").default;
-const Course = require("./pages/Course").default;
-const Profile = require("./pages/Profile").default;
-const Dashboard = require("./pages/admin/Dashboard").default;
-const DashboardCourse = require("./pages/admin/Course").default;
-const DashboardProfile = require("./pages/admin/Profile").default;
-const DashboardUser = require("./pages/admin/User").default;
-const DashboardUserCourse = require("./pages/admin/UserCourse").default;
+const Home = require("./pages/home").default;
+const Register = require("./pages/auth/register").default;
+const Login = require("./pages/auth/login").default;
+const Course = require("./pages/course/index").default;
+const CourseDetail = require("./pages/course/detail").default;
+const Profile = require("./pages/profile").default;
+const Dashboard = require("./pages/admin/dashboard").default;
+const DashboardCourse = require("./pages/admin/course").default;
+const DashboardProfile = require("./pages/admin/profile").default;
+const DashboardUser = require("./pages/admin/user").default;
+const DashboardUserCourse = require("./pages/admin/user-course").default;
 
 const authAdmin = {
   auth: {
@@ -26,6 +27,11 @@ const routes = [
     path: "/",
     name: "home",
     component: Home
+  },
+  {
+    path: "/course/detail/:id",
+    name: "course-detail",
+    component: CourseDetail
   },
   {
     path: "/courses",

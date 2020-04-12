@@ -9,7 +9,7 @@
   </div>
 </template>
 <script>
-import Report from "../../components/Report.vue";
+import Report from "../../components/admin/Report.vue";
 export default {
   mounted() {
     //

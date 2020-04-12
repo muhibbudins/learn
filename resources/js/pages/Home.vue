@@ -2,13 +2,16 @@
   <div class="container">
     <div class="card card-default">
       <div class="card-body">
-        Halaman Depan
+        <div>Latest Courses</div>
+        <ListCourse />
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import ListCourse from "../components/student/ListCourse.vue";
+
 export default {
   data() {
     return {
@@ -16,7 +19,7 @@ export default {
     };
   },
   components: {
-    //
+    ListCourse
   },
   mounted() {
     this.$auth.load().then(() => {

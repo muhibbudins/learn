@@ -9,7 +9,7 @@
   </div>
 </template>
 <script>
-import ListUser from "../../components/ListUser.vue";
+import ListUser from "../../components/admin/ListUser.vue";
 export default {
   mounted() {
     //

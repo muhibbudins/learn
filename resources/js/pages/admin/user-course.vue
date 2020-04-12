@@ -9,7 +9,7 @@
   </div>
 </template>
 <script>
-import ListUserCourse from "../../components/ListUserCourse.vue";
+import ListUserCourse from "../../components/admin/ListUserCourse.vue";
 export default {
   mounted() {
     //
