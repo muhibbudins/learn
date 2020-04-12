@@ -17,7 +17,8 @@ class CreateModuleQuizTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('module_id');
             $table->string('title');
-            $table->text('content');
+            $table->string('description')->default('')->nullable();
+            $table->tinyInteger('status')->default(1)->nullable();
             $table->timestamps();
             $table->softDeletes();
 

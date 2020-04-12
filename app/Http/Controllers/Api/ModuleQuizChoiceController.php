@@ -42,7 +42,8 @@ class ModuleQuizChoiceController extends Controller
     public function create(Request $request) {
         $validator = Validator::make($request->all(), [
             'module_quiz_question_id' => 'required|string',
-            'content' => 'required|string',
+            'title' => 'string',
+            'description' => 'string',
             'answer' => 'required|string',
         ]);
 
@@ -57,7 +58,8 @@ class ModuleQuizChoiceController extends Controller
         try {
             $moduleQuizChoices = ModuleQuizChoices::create([
                 'module_quiz_question_id' => $request->get('module_quiz_question_id'),
-                'content' => $request->get('content'),
+                'title' => $request->get('title'),
+                'description' => $request->get('description'),
                 'answer' => $request->get('answer'),
             ]);
     
@@ -78,7 +80,8 @@ class ModuleQuizChoiceController extends Controller
     public function update(Request $request, $entity) {
         $validator = Validator::make($request->all(), [
             'module_quiz_question_id' => 'string',
-            'content' => 'string',
+            'title' => 'string',
+            'description' => 'string',
             'answer' => 'string',
         ]);
 
@@ -118,8 +121,11 @@ class ModuleQuizChoiceController extends Controller
             if ($request->get('module_quiz_question_id')) {
                 $moduleQuizChoiceData->module_quiz_question_id = $request->get('module_quiz_question_id');
             }
-            if ($request->get('content')) {
-                $moduleQuizChoiceData->content = $request->get('content');
+            if ($request->get('title')) {
+                $moduleQuizChoiceData->title = $request->get('title');
+            }
+            if ($request->get('description')) {
+                $moduleQuizChoiceData->description = $request->get('description');
             }
             if ($request->get('answer') !== null) {
                 $moduleQuizChoiceData->answer = $request->get('answer');

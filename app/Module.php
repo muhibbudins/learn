@@ -42,7 +42,7 @@ class Module extends Model
       return $this->hasMany('App\ModuleQuiz')->select(
         'id',
         'title',
-        'content'
+        'description'
       );
   }
 }

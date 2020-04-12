@@ -16,7 +16,7 @@ class UserCourseModule extends Model
    */
   protected $fillable = [
     'user_course_id',
-    'module_id',
+    'module_lesson_id',
     'completed',
   ];
 }

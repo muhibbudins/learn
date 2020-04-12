@@ -38,6 +38,14 @@ class CourseController extends Controller
             }
 
             $course = Course::find($entity);
+
+            if (!$course) {
+                return response()->json([
+                    'error'   => true,
+                    'message' => 'This course is not found',
+                    'data'    => []
+                ], 400);
+            }
             
             if ($course) {
                 $course['modules'] = $course->modules;
@@ -86,7 +94,7 @@ class CourseController extends Controller
         }
     }
 
-    public function roomDetail(Request $request, $entity) {
+    public function room(Request $request, $userCourse, $entity) {
         try {
             if (!$entity) {
                 return response()->json([
@@ -232,6 +240,7 @@ class CourseController extends Controller
             'title' => 'required|string',
             'description' => 'required|string',
             'content' => 'required|string',
+            'status' => 'integer',
         ]);
 
         if($validator->fails()){
@@ -244,9 +253,10 @@ class CourseController extends Controller
 
         try {
             $course = Course::create([
-                'title' => $request->get('title'),
-                'description' => $request->get('description'),
+                'title' => $request->get('title'), // Max 200 char
+                'description' => $request->get('description'), // Max 200 char
                 'content' => $request->get('content'),
+                'status' => $request->get('status') ?? 1,
             ]);
     
             return response()->json([
@@ -268,7 +278,7 @@ class CourseController extends Controller
             'title' => 'string',
             'description' => 'string',
             'content' => 'string',
-            'status' => 'string',
+            'status' => 'integer',
         ]);
 
         if($validator->fails()){

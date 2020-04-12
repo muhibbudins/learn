@@ -12,6 +12,127 @@ use Illuminate\Support\Facades\Validator;
 
 class UserCourseController extends Controller
 {
+    public function room(Request $request, $userCourse, $course) {
+        try {
+            $courseStatus = [];
+            $userCourse = UserCourse::find($userCourse);
+
+            if (!$userCourse) {
+                return response()->json([
+                    'error'   => true,
+                    'message' => 'Can\'t find the relation of courses',
+                    'data'    => []
+                ], 400);
+            }
+
+            $courseStatus['id'] = $userCourse->id;
+            $courseStatus['course_id'] = $userCourse->course_id;
+            $courseStatus['updated_at'] = $userCourse->updated_at;
+
+            $userCourse['course'] = $userCourse->course;
+
+            if ($userCourse['course']) {
+                foreach($userCourse['course']->modules as $modules) {
+                    if ($modules->lessons) {
+                        foreach ($modules->lessons as $lessons) {
+                            $courseStatus['modules'][$modules->id]['lessons'][] = [
+                                'id' => $lessons->id,
+                                'completed' => false
+                            ];
+                        }
+                    }
+
+                    if ($modules->quizzes) {
+                        foreach ($modules->quizzes as $quizzes) {
+                            $quizzes['questions'] = $quizzes->questions;
+
+                            $courseStatus['modules'][$modules->id]['quizzes'][$quizzes->id] = [];
+
+                            if ($quizzes->questions) {
+                                foreach ($quizzes->questions as $questions) {
+                                    $questionAnswer = 0;
+                                    
+                                    foreach ($questions->choices as $choice) {
+                                        if ($choice->answer) {
+                                            $questionAnswer = $choice->id;
+                                        }
+                                    }
+
+                                    $courseStatus['modules'][$modules->id]['quizzes'][$quizzes->id][] = [
+                                        'id' => $questions->id,
+                                        'completed' => false,
+                                        'correct' => false,
+                                        'valid' => $questionAnswer
+                                    ];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            $userCourseModules = $userCourse->modules;
+            $userCourseQuizzes = $userCourse->quizzes;
+
+            $completedLessons = [];
+            $completedQuizzes = [];
+
+            foreach ($userCourseModules as $modules) {
+                if ($modules->completed) {
+                    array_push($completedLessons, [
+                        'lesson' => $modules->module_lesson_id,
+                        'updated_at' => $modules->updated_at,
+                    ]);
+                }
+            }
+
+            foreach ($userCourseQuizzes as $quizzes) {
+                if ($quizzes->module_quiz_choice_id) {
+                    array_push($completedQuizzes, [
+                        'question' => $quizzes->module_quiz_question_id,
+                        'choice' => $quizzes->module_quiz_choice_id,
+                        'updated_at' => $quizzes->updated_at,
+                    ]);
+                }
+            }
+
+            foreach ($courseStatus['modules'] as $moduleId => $modules) {
+                foreach ($modules['lessons'] as $lessonIndex => $lesson) {
+                    foreach($completedLessons as $completedLesson) {
+                        if ($lesson['id'] == $completedLesson['lesson']) {
+                            $courseStatus['modules'][$moduleId]['lessons'][$lessonIndex]['completed'] = true;
+                            $courseStatus['modules'][$moduleId]['lessons'][$lessonIndex]['updated_at'] = $completedLesson['updated_at'];
+                        }
+                    }
+                }
+                
+                foreach ($modules['quizzes'] as $quizzesIndex => $quizzes) {
+                    foreach($quizzes as $questionIndex => $question) {
+                        foreach($completedQuizzes as $completedQuiz) {
+                            if ($question['id'] == $completedQuiz['question']) {
+                                $courseStatus['modules'][$moduleId]['quizzes'][$quizzesIndex][$questionIndex]['completed'] = true;
+    
+                                if ($question['valid'] === $completedQuiz['choice']) {
+                                    $courseStatus['modules'][$moduleId]['quizzes'][$quizzesIndex][$questionIndex]['correct'] = true;
+                                    $courseStatus['modules'][$moduleId]['quizzes'][$quizzesIndex][$questionIndex]['updated_at'] = $completedQuiz['updated_at'];
+                                    unset($courseStatus['modules'][$moduleId]['quizzes'][$quizzesIndex][$questionIndex]['valid']);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return response()->json($courseStatus, 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error'   => true,
+                'message' => 'Something went wrong when reading a module quiz',
+                'data'    => []
+            ], 500);
+        }
+    }
+
     public function leave(Request $request, $course) {
         try {
             $courseParameter = [

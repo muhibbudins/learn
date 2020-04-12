@@ -17,7 +17,8 @@ class ModuleQuiz extends Model
   protected $fillable = [
     'module_id',
     'title',
-    'content',
+    'description',
+    'status',
   ];
 
   /**
@@ -29,7 +30,7 @@ class ModuleQuiz extends Model
         'id',
         'module_quiz_id',
         'title',
-        'content',
+        'description',
         'status'
       );
   }

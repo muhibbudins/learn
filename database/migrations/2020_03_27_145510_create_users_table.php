@@ -23,7 +23,7 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->string('role', 30)->default('guest');
             $table->text('address')->nullable();
-            $table->boolean('status')->default(true);
+            $table->tinyInteger('status')->default(1)->nullable();
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();

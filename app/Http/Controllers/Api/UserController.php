@@ -173,6 +173,7 @@ class UserController extends Controller
             'email'    => 'required|email|unique:users',
             'password' => 'required|min:3|confirmed',
             'role' => 'string',
+            'status' => 'integer',
         ]);
 
         if($validator->fails()){
@@ -189,6 +190,7 @@ class UserController extends Controller
                 'email' => $request->get('email'),
                 'password' => Hash::make($request->get('password')),
                 'role' => $request->get('role') ?? 'student',
+                'status' => $request->get('status') ?? 1,
             ]);
     
             return response()->json([
@@ -214,7 +216,7 @@ class UserController extends Controller
             'firstname' => 'string',
             'lastname' => 'string',
             'address' => 'string',
-            'status' => 'string',
+            'status' => 'integer',
         ]);
 
         if($validator->fails()){

@@ -89,16 +89,16 @@ export default {
         student: [
           {
             name: "Home",
-            path: "home"
+            path: "student"
           },
           {
             name: "Courses",
-            path: "courses",
+            path: "student-courses",
             auth: true
           },
           {
             name: "Profile",
-            path: "profile"
+            path: "student-profile"
           },
           {
             name: "Logout",

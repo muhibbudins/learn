@@ -18,7 +18,7 @@ class CreateCoursesTable extends Migration
             $table->string('title');
             $table->string('description')->default('');
             $table->text('content');
-            $table->boolean('status')->default(false);
+            $table->tinyInteger('status')->default(1)->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

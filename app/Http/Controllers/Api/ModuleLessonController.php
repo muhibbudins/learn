@@ -11,6 +11,34 @@ use Illuminate\Support\Facades\Validator;
 
 class ModuleLessonController extends Controller
 {
+    public function room(Request $request, $userCourse, $entity) {
+        $entity = $entity ?? $request->get('entity');
+        $includes = $request->get('includes');
+        $trashed = $request->get('trashed');
+
+        try {
+            if ($entity || $includes) {
+                $moduleLessons = ModuleLesson::find($entity ?? explode(',', $includes));
+            }
+    
+            else if ($trashed) {
+                $moduleLessons = ModuleLesson::onlyTrashed()->paginate(30);
+            }
+    
+            else {
+                $moduleLessons = ModuleLesson::paginate(30);
+            }
+    
+            return response()->json($moduleLessons, 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error'   => true,
+                'message' => 'Something went wrong when reading a module lesson',
+                'data'    => []
+            ], 500);
+        }
+    }
+
     public function read(Request $request, $entity = null) {
         $entity = $entity ?? $request->get('entity');
         $includes = $request->get('includes');
@@ -45,6 +73,7 @@ class ModuleLessonController extends Controller
             'title' => 'required|string',
             'description' => 'required|string',
             'content' => 'required|string',
+            'status' => 'integer',
         ]);
 
         if($validator->fails()){
@@ -61,6 +90,7 @@ class ModuleLessonController extends Controller
                 'title' => $request->get('title'),
                 'description' => $request->get('description'),
                 'content' => $request->get('content'),
+                'status' => $request->get('status') ?? 1,
             ]);
     
             return response()->json([
@@ -83,7 +113,7 @@ class ModuleLessonController extends Controller
             'title' => 'string',
             'description' => 'string',
             'content' => 'string',
-            'status' => 'string',
+            'status' => 'integer',
         ]);
 
         if($validator->fails()){

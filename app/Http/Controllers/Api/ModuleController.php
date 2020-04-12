@@ -44,6 +44,7 @@ class ModuleController extends Controller
             'course_id' => 'string',
             'title' => 'required|string',
             'description' => 'required|string',
+            'status' => 'integer',
         ]);
 
         if($validator->fails()){
@@ -59,6 +60,7 @@ class ModuleController extends Controller
                 'course_id' => $request->get('course_id'),
                 'title' => $request->get('title'),
                 'description' => $request->get('description'),
+                'status' => $request->get('status') ?? 1,
             ]);
     
             return response()->json([
@@ -80,7 +82,7 @@ class ModuleController extends Controller
             'course_id' => 'string',
             'title' => 'string',
             'description' => 'string',
-            'status' => 'string',
+            'status' => 'integer',
         ]);
 
         if($validator->fails()){

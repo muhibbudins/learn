@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import ListCourse from "../components/student/ListCourse.vue";
+import ListCourse from "../../components/student/ListCourse.vue";
 
 export default {
   data() {

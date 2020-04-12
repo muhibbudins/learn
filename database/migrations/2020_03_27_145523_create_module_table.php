@@ -18,7 +18,7 @@ class CreateModuleTable extends Migration
             $table->unsignedBigInteger('course_id');
             $table->string('title');
             $table->string('description')->default('');
-            $table->boolean('status')->default(false);
+            $table->tinyInteger('status')->default(1)->nullable();
             $table->timestamps();
             $table->softDeletes();
 

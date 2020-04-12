@@ -14,7 +14,7 @@ class UserCourseModuleController extends Controller
     public function saveState(Request $request) {
         $validator = Validator::make($request->all(), [
             'user_course_id' => 'required|string',
-            'module_id' => 'required|string',
+            'module_lesson_id' => 'required|string',
             'completed' => 'required|integer',
         ]);
 
@@ -29,7 +29,7 @@ class UserCourseModuleController extends Controller
         try {
             $selectParamater = [
                 'user_course_id' => $request->get('user_course_id'),
-                'module_id' => $request->get('module_id'),
+                'module_lesson_id' => $request->get('module_lesson_id'),
             ];
             
             $isAlreadySaved = UserCourseModule::where($selectParamater)->count();

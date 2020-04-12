@@ -16,7 +16,8 @@ class CreateModuleQuizChoicesTable extends Migration
         Schema::create('module_quiz_choices', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('module_quiz_question_id');
-            $table->string('content');
+            $table->string('title');
+            $table->string('description')->default('')->nullable();
             $table->boolean('answer')->default(false);
             $table->timestamps();
             $table->softDeletes();

@@ -17,7 +17,7 @@ class ModuleQuizQuestion extends Model
   protected $fillable = [
     'module_quiz_id',
     'title',
-    'content',
+    'description',
     'status',
   ];
 
@@ -29,7 +29,9 @@ class ModuleQuizQuestion extends Model
       return $this->hasMany('App\ModuleQuizChoices')->select(
         'id',
         'module_quiz_question_id',
-        'content'
+        'title',
+        'description',
+        'answer'
       );
   }
 }

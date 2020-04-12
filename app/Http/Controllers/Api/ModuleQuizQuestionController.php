@@ -46,7 +46,8 @@ class ModuleQuizQuestionController extends Controller
         $validator = Validator::make($request->all(), [
             'module_quiz_id' => 'required|string',
             'title' => 'required|string',
-            'content' => 'required|string'
+            'description' => 'string',
+            'status' => 'integer',
         ]);
 
         if($validator->fails()){
@@ -61,7 +62,8 @@ class ModuleQuizQuestionController extends Controller
             $moduleQuizQuestion = ModuleQuizQuestion::create([
                 'module_quiz_id' => $request->get('module_quiz_id'),
                 'title' => $request->get('title'),
-                'content' => $request->get('content'),
+                'description' => $request->get('description'),
+                'status' => $request->get('status') ?? 1,
             ]);
     
             return response()->json([
@@ -82,8 +84,8 @@ class ModuleQuizQuestionController extends Controller
         $validator = Validator::make($request->all(), [
             'module_quiz_id' => 'string',
             'title' => 'string',
-            'content' => 'string',
-            'status' => 'string',
+            'description' => 'string',
+            'status' => 'integer',
         ]);
 
         if($validator->fails()){
@@ -125,8 +127,8 @@ class ModuleQuizQuestionController extends Controller
             if ($request->get('title')) {
                 $moduleQuestionData->title = $request->get('title');
             }
-            if ($request->get('content')) {
-                $moduleQuestionData->content = $request->get('content');
+            if ($request->get('description')) {
+                $moduleQuestionData->description = $request->get('description');
             }
             if ($request->get('status')) {
                 $moduleQuestionData->status = $request->get('status');

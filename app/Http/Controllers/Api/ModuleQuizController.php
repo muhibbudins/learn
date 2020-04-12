@@ -11,6 +11,25 @@ use Illuminate\Support\Facades\Validator;
 
 class ModuleQuizController extends Controller
 {
+    public function room(Request $request, $userCourseModule, $entity) {
+        try {
+            $moduleQuiz = ModuleQuiz::find($entity);
+            $moduleQuiz['questions'] = $moduleQuiz->questions;
+
+            foreach ($moduleQuiz['questions'] as $question) {
+                $question['choices'] = $question->choices;
+            }
+    
+            return response()->json($moduleQuiz, 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error'   => true,
+                'message' => 'Something went wrong when reading a module quiz',
+                'data'    => []
+            ], 500);
+        }
+    }
+
     public function read(Request $request, $entity = null) {
         $entity = $entity ?? $request->get('entity');
         $includes = $request->get('includes');
@@ -46,7 +65,8 @@ class ModuleQuizController extends Controller
         $validator = Validator::make($request->all(), [
             'module_id' => 'required|string',
             'title' => 'required|string',
-            'content' => 'required|string'
+            'description' => 'string',
+            'status' => 'integer',
         ]);
 
         if($validator->fails()){
@@ -61,7 +81,8 @@ class ModuleQuizController extends Controller
             $moduleQuiz = ModuleQuiz::create([
                 'module_id' => $request->get('module_id'),
                 'title' => $request->get('title'),
-                'content' => $request->get('content'),
+                'description' => $request->get('description'),
+                'status' => $request->get('status') ?? 1,
             ]);
     
             return response()->json([
@@ -82,7 +103,8 @@ class ModuleQuizController extends Controller
         $validator = Validator::make($request->all(), [
             'module_id' => 'string',
             'title' => 'string',
-            'content' => 'string',
+            'description' => 'string',
+            'status' => 'integer',
         ]);
 
         if($validator->fails()){
@@ -124,8 +146,11 @@ class ModuleQuizController extends Controller
             if ($request->get('title')) {
                 $moduleQuizData->title = $request->get('title');
             }
-            if ($request->get('content')) {
-                $moduleQuizData->content = $request->get('content');
+            if ($request->get('description')) {
+                $moduleQuizData->description = $request->get('description');
+            }
+            if ($request->get('status')) {
+                $moduleQuizData->status = $request->get('status');
             }
 
             $moduleQuizData->save();

@@ -1,64 +1,39 @@
 const VueRouter = require("vue-router").default;
 
-// Pages
-const Home = require("./pages/home").default;
-const Register = require("./pages/auth/register").default;
-const Login = require("./pages/auth/login").default;
-const Course = require("./pages/course/index").default;
-const CourseDetail = require("./pages/course/detail").default;
-const Profile = require("./pages/profile").default;
+// Admin Pages
 const Dashboard = require("./pages/admin/dashboard").default;
+const DashboardUser = require("./pages/admin/user").default;
 const DashboardCourse = require("./pages/admin/course").default;
 const DashboardProfile = require("./pages/admin/profile").default;
-const DashboardUser = require("./pages/admin/user").default;
 const DashboardUserCourse = require("./pages/admin/user-course").default;
+
+// Authentication
+const Login = require("./pages/auth/login").default;
+const Register = require("./pages/auth/register").default;
+
+// General
+const Home = require("./pages/general/index").default;
+const Detail = require("./pages/general/detail").default;
+
+// Room
+const Room = require("./pages/room/index").default;
+
+// Student
+const Student = require("./pages/student/index").default;
+const StudentCourse = require("./pages/student/course").default;
+const StudentProfile = require("./pages/student/profile").default;
 
 const authAdmin = {
   auth: {
     roles: "admin",
     redirect: { name: "login" },
-    forbiddenRedirect: { name: "home" },
+    forbiddenRedirect: { name: "home" }
   }
-}
+};
 
 // Routes
 const routes = [
-  {
-    path: "/",
-    name: "home",
-    component: Home
-  },
-  {
-    path: "/course/detail/:id",
-    name: "course-detail",
-    component: CourseDetail
-  },
-  {
-    path: "/courses",
-    name: "courses",
-    component: Course,
-    meta: {
-      auth: true
-    }
-  },
-  {
-    path: "/profile",
-    name: "profile",
-    component: Profile,
-    meta: {
-      auth: true
-    }
-  },
-  {
-    path: "/register",
-    name: "register",
-    component: Register
-  },
-  {
-    path: "/login",
-    name: "login",
-    component: Login
-  },
+  // Admin Pages
   {
     path: "/dashboard",
     name: "dashboard",
@@ -97,6 +72,60 @@ const routes = [
     component: DashboardUserCourse,
     meta: {
       ...authAdmin
+    }
+  },
+
+  // Authentication
+  {
+    path: "/auth/register",
+    name: "register",
+    component: Register
+  },
+  {
+    path: "/auth/login",
+    name: "login",
+    component: Login
+  },
+
+  // General
+  {
+    path: "/",
+    name: "home",
+    component: Home
+  },
+  {
+    path: "/course/detail/:id",
+    name: "course-detail",
+    component: Detail
+  },
+
+  // Room
+  {
+    path: "/room/:course/:user_course",
+    name: "room",
+    component: Room
+  },
+
+  // Student
+  {
+    path: "/student",
+    name: "student",
+    component: Student
+  },
+  {
+    path: "/student/courses",
+    name: "student-courses",
+    component: StudentCourse,
+    meta: {
+      auth: true
+    }
+  },
+  {
+    path: "/student/profile",
+    name: "student-profile",
+    component: StudentProfile,
+    meta: {
+      auth: true
     }
   }
 ];

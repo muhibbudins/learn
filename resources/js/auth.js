@@ -9,7 +9,7 @@ const config = {
   router: router,
   tokenDefaultName: "e-learning",
   rolesKey: "role",
-  registerData: { url: "v1/auth/register", method: "POST", redirect: "/login" },
+  registerData: { url: "v1/auth/register", method: "POST", redirect: "/auth/login" },
   loginData: {
     url: "v1/auth/login",
     method: "POST",
@@ -19,7 +19,7 @@ const config = {
   logoutData: {
     url: "v1/auth/logout",
     method: "POST",
-    redirect: "/login",
+    redirect: "/auth/login",
     makeRequest: true
   },
   fetchData: { url: "v1/account/me", method: "GET", enabled: true },
