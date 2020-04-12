@@ -1,5 +1,10 @@
 <template>
   <div class="container">
+    <div class="card card-default mb-3">
+      <div class="card-body">
+        Register Page
+      </div>
+    </div>
     <div class="card card-default">
       <div class="card-body">
         <div class="alert alert-danger" v-if="has_error && !success">

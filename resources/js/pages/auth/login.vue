@@ -2,7 +2,12 @@
   <div class="container">
     <div class="row">
       <div class="col-4 mx-auto">
-        <div class="card">
+        <div class="card card-default mb-3">
+          <div class="card-body">
+            Login Page
+          </div>
+        </div>
+        <div class="card card-default">
           <div class="card-body">
             <div class="alert alert-danger" v-if="has_error">
               Can't logged in, your username or password is invalid

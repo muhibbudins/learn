@@ -176,17 +176,16 @@ class UserCourseController extends Controller
         try {
             // Force get only user data when access role not admin
             if (Auth::user()->role !== 'admin') {
-                $userCourses = [];
                 $userCourseData = UserCourse::where('user_id', Auth::user()->id)->get();
 
                 foreach ($userCourseData as $userCourse) {
-                    $userCourses[] = $userCourse->course;
+                    $userCourse->course;
                 }
 
                 $userCourses = [
                     'error'   => false,
                     'message' => 'Successfully reading a user course',
-                    'data'    => $userCourses
+                    'data'    => $userCourseData
                 ];
             } else {
                 if ($entity) {

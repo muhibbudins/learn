@@ -5,30 +5,40 @@
         <div>Latest Courses</div>
       </div>
     </div>
-    <ListCourse />
+    <div class="row">
+      <div class="col-4" v-for="course in courses" :key="course.id">
+        <CardCourse :course="course" />
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import ListCourse from "../../components/student/ListCourse.vue";
+import CardCourse from "../../components/CardCourse.vue";
 
 export default {
   data() {
     return {
-      //
+      courses: []
     };
   },
   components: {
-    ListCourse
+    CardCourse
   },
   mounted() {
-    this.$auth.load().then(() => {
-      const { role } = this.$auth.check() && this.$auth.user()
-
-      if (role === "admin") {
-        this.$router.push({ name: "dashboard" });
-      }
-    })
+    this.getCourses();
+  },
+  methods: {
+    getCourses() {
+      this.$http({
+        url: `/v1/general/course`,
+        method: "GET"
+      }).then(
+        ({ data }) => {
+          this.courses = data.data;
+        }
+      );
+    }
   }
 };
 </script>

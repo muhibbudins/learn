@@ -1,24 +1,28 @@
 <template>
   <div class="container">
+    <div class="card card-default mb-3">
+      <div class="card-body">
+        Class Room
+      </div>
+    </div>
     <div class="card card-default">
       <div class="card-body">
-        <h5>List Courses</h5>
-        <ListCourse />
+        Some magic will be here
       </div>
     </div>
   </div>
 </template>
-<script>
-import ListCourse from "../../components/student/ListCourse.vue";
 
+<script>
 export default {
   mounted() {
     //
   },
   components: {
-    ListCourse
+    // 
   },
   mounted() {
+    // 
   }
 };
 </script>

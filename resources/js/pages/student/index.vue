@@ -2,7 +2,7 @@
   <div class="container">
     <div class="card card-default">
       <div class="card-body">
-        <h5>User Reporting Page</h5>
+        <div>User Reporting Page</div>
       </div>
     </div>
   </div>
@@ -15,6 +15,13 @@ export default {
   components: {
   },
   mounted() {
+    this.$auth.load().then(() => {
+      const { role } = this.$auth.check() && this.$auth.user()
+
+      if (role === "admin") {
+        this.$router.push({ name: "dashboard" });
+      }
+    })
   }
 };
 </script>

@@ -1,24 +1,44 @@
 <template>
   <div class="container">
-    <div class="card card-default">
+    <div class="card card-default mb-3">
       <div class="card-body">
-        <h5>List Courses</h5>
-        <ListCourse />
+        <div>My Courses</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-4" v-for="course in courses" :key="course.id">
+        <CardRoom :user-course="course" />
       </div>
     </div>
   </div>
 </template>
+
 <script>
-import ListCourse from "../../components/student/ListCourse.vue";
+import CardRoom from "../../components/CardRoom.vue";
 
 export default {
-  mounted() {
-    //
+  data() {
+    return {
+      courses: []
+    };
   },
   components: {
-    ListCourse
+    CardRoom
   },
   mounted() {
+    this.getCourses();
+  },
+  methods: {
+    getCourses() {
+      this.$http({
+        url: `/v1/account/course`,
+        method: "GET"
+      }).then(
+        ({ data }) => {
+          this.courses = data.data;
+        }
+      );
+    }
   }
 };
 </script>

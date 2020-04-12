@@ -1,5 +1,10 @@
 <template>
   <div class="container">
+    <div class="card card-default mb-3">
+      <div class="card-body">
+        <div>Courses</div>
+      </div>
+    </div>
     <div class="row">
       <div class="col-4">
         <div class="card card-default">
@@ -11,7 +16,6 @@
       <div class="col-8">
         <div class="card card-default">
           <div class="card-body">
-            <h5>Admin Dashboard</h5>
             <ListCourse />
           </div>
         </div>
