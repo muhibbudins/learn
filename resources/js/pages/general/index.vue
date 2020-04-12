@@ -1,11 +1,11 @@
 <template>
   <div class="container">
-    <div class="card card-default">
+    <div class="card card-default mb-3">
       <div class="card-body">
         <div>Latest Courses</div>
-        <ListCourse />
       </div>
     </div>
+    <ListCourse />
   </div>
 </template>
 
