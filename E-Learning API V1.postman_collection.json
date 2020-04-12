@@ -385,7 +385,7 @@
 								},
 								{
 									"key": "user_id",
-									"value": "5",
+									"value": "3",
 									"description": "User Id",
 									"type": "text"
 								}
@@ -502,7 +502,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/v1/room/course/1",
+							"raw": "{{host}}/api/v1/room/course/1/1",
 							"host": [
 								"{{host}}"
 							],
@@ -511,6 +511,51 @@
 								"v1",
 								"room",
 								"course",
+								"1",
+								"1"
+							],
+							"query": [
+								{
+									"key": "trashed",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "includes",
+									"value": "1,2,3,4",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Course Status",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/room/status/1/1",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"room",
+								"status",
+								"1",
 								"1"
 							],
 							"query": [
@@ -545,7 +590,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/v1/room/lesson/1",
+							"raw": "{{host}}/api/v1/room/lesson/1/1",
 							"host": [
 								"{{host}}"
 							],
@@ -554,6 +599,7 @@
 								"v1",
 								"room",
 								"lesson",
+								"1",
 								"1"
 							],
 							"query": [
@@ -593,7 +639,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/v1/room/quiz/1",
+							"raw": "{{host}}/api/v1/room/quiz/1/1",
 							"host": [
 								"{{host}}"
 							],
@@ -602,6 +648,7 @@
 								"v1",
 								"room",
 								"quiz",
+								"1",
 								"1"
 							],
 							"query": [
@@ -649,7 +696,7 @@
 									"type": "text"
 								},
 								{
-									"key": "module_id",
+									"key": "module_lesson_id",
 									"value": "1",
 									"type": "text"
 								},
@@ -708,7 +755,7 @@
 								},
 								{
 									"key": "module_quiz_choice_id",
-									"value": "1",
+									"value": "2",
 									"description": "Answer of quiz, or can fill with essay below",
 									"type": "text"
 								},
@@ -716,7 +763,8 @@
 									"key": "essay",
 									"value": "test",
 									"description": "Fill this if user quiz have essay answer",
-									"type": "text"
+									"type": "text",
+									"disabled": true
 								}
 							]
 						},
@@ -989,20 +1037,20 @@
 							"formdata": [
 								{
 									"key": "title",
-									"value": "Course 1",
+									"value": "Learn about Lorem Ipsum dummy text",
 									"description": "Title of course",
 									"type": "text"
 								},
 								{
-									"key": "description",
-									"value": "This is an example of course description",
-									"description": "Short description about the course",
+									"key": "content",
+									"value": "### What is Lorem Ipsum?\n\nLorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.\n\n#### Where does it come from?\n\nContrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of \"de Finibus Bonorum et Malorum\" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, \"Lorem ipsum dolor sit amet..\", comes from a line in section 1.10.32.",
+									"description": "Full content of the course",
 									"type": "text"
 								},
 								{
-									"key": "content",
-									"value": "In this course you will be learn bla bla bla ...",
-									"description": "Full content of the course",
+									"key": "description",
+									"value": "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+									"description": "Short description about the course",
 									"type": "text"
 								}
 							]
@@ -1133,13 +1181,13 @@
 								},
 								{
 									"key": "title",
-									"value": "Module 1 title",
+									"value": "The history of Lorem Ipsum",
 									"description": "Title of the module",
 									"type": "text"
 								},
 								{
 									"key": "description",
-									"value": "We will learn about module 1",
+									"value": "In first module we will learn about history of the lorem ipsum",
 									"description": "Short description about the module",
 									"type": "text"
 								}
@@ -1180,7 +1228,7 @@
 							"formdata": [
 								{
 									"key": "course_id",
-									"value": "2",
+									"value": "1",
 									"description": "Course Id",
 									"type": "text"
 								},
@@ -1266,19 +1314,19 @@
 							"formdata": [
 								{
 									"key": "title",
-									"value": "Lesson 2",
+									"value": "Why do we use it?",
 									"description": "Title of the lesson",
 									"type": "text"
 								},
 								{
 									"key": "description",
-									"value": "In this lesson we will learn bla bla",
+									"value": "he point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.",
 									"description": "Short description or notes",
 									"type": "text"
 								},
 								{
 									"key": "content",
-									"value": "Lesson 2 will teach you something in this course ",
+									"value": "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).",
 									"description": "Full content of the lesson",
 									"type": "text"
 								},
@@ -1425,7 +1473,7 @@
 								},
 								{
 									"key": "content",
-									"value": "This is an example for quiz one",
+									"value": "Please read a module before answering the question",
 									"description": "Content of the quiz",
 									"type": "text"
 								},
@@ -1561,15 +1609,16 @@
 							"formdata": [
 								{
 									"key": "title",
-									"value": "This is an example of quiz one",
+									"value": "Who is Richard McClintock?",
 									"description": "Title of the quiz",
 									"type": "text"
 								},
 								{
 									"key": "content",
-									"value": "With some notes here",
+									"value": "",
 									"description": "Content of the quiz",
-									"type": "text"
+									"type": "text",
+									"disabled": true
 								},
 								{
 									"key": "module_quiz_id",
@@ -1616,13 +1665,13 @@
 							"formdata": [
 								{
 									"key": "title",
-									"value": "This is an example of quiz 1",
+									"value": "From the module, is Lorem Ipsum only simply random text?",
 									"description": "Title of the quiz",
 									"type": "text"
 								},
 								{
 									"key": "content",
-									"value": "With some notes here",
+									"value": "-",
 									"description": "Content of the quiz",
 									"type": "text"
 								},
@@ -1710,8 +1759,8 @@
 									"type": "text"
 								},
 								{
-									"key": "content",
-									"value": "Quiz Two Answer 3",
+									"key": "title",
+									"value": "A Latin professor at Hampden-Sydney College in Virginia",
 									"description": "Content of the answer",
 									"type": "text"
 								},
@@ -1765,10 +1814,11 @@
 									"type": "text"
 								},
 								{
-									"key": "content",
+									"key": "title",
 									"value": "Quiz Two Answer One",
 									"description": "Content of the answer",
-									"type": "text"
+									"type": "text",
+									"disabled": true
 								},
 								{
 									"key": "answer",
@@ -1906,7 +1956,7 @@
 							"formdata": [
 								{
 									"key": "name",
-									"value": "Super Admin",
+									"value": "admin",
 									"description": "Username of user",
 									"type": "text"
 								},
@@ -1940,10 +1990,9 @@
 								},
 								{
 									"key": "firstname",
-									"value": "",
+									"value": "Administrator",
 									"description": "Firstname",
-									"type": "text",
-									"disabled": true
+									"type": "text"
 								},
 								{
 									"key": "lastname",
@@ -2042,7 +2091,7 @@
 								},
 								{
 									"key": "user_id",
-									"value": "1",
+									"value": "3",
 									"description": "User ID",
 									"type": "text"
 								}
