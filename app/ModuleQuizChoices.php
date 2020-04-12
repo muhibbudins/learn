@@ -15,7 +15,7 @@ class ModuleQuizChoices extends Model
    * @var array
    */
   protected $fillable = [
-    'module_quiz_id',
+    'module_quiz_question_id',
     'content',
     'answer',
   ];

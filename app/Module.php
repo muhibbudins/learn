@@ -16,8 +16,6 @@ class Module extends Model
    */
   protected $fillable = [
     'course_id',
-    'module_lesson_id',
-    'module_quiz_id',
     'title',
     'description',
     'status',
@@ -28,7 +26,12 @@ class Module extends Model
    */
   public function lessons()
   {
-      return $this->hasMany('App\ModuleLesson');
+      return $this->hasMany('App\ModuleLesson')->select(
+        'id',
+        'title',
+        'description',
+        'content'
+      );
   }
 
   /**
@@ -36,6 +39,10 @@ class Module extends Model
    */
   public function quizzes()
   {
-      return $this->hasMany('App\ModuleQuiz');
+      return $this->hasMany('App\ModuleQuiz')->select(
+        'id',
+        'title',
+        'content'
+      );
   }
 }

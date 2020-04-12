@@ -34,4 +34,20 @@ class UserCourse extends Model
   {
       return $this->belongsTo('App\User');
   }
+
+  /**
+   * Get the modules for the user course.
+   */
+  public function modules()
+  {
+      return $this->hasMany('App\UserCourseModule');
+  }
+
+  /**
+   * Get the quizzes for the user course.
+   */
+  public function quizzes()
+  {
+      return $this->hasMany('App\UserCourseQuiz');
+  }
 }

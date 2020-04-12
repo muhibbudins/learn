@@ -11,8 +11,8 @@ use Illuminate\Support\Facades\Validator;
 
 class ModuleLessonController extends Controller
 {
-    public function read(Request $request) {
-        $entity = $request->get('entity');
+    public function read(Request $request, $entity = null) {
+        $entity = $entity ?? $request->get('entity');
         $includes = $request->get('includes');
         $trashed = $request->get('trashed');
 
@@ -41,8 +41,9 @@ class ModuleLessonController extends Controller
 
     public function create(Request $request) {
         $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:200',
-            'description' => 'required|string|max:255',
+            'module_id' => 'required|string',
+            'title' => 'required|string',
+            'description' => 'required|string',
             'content' => 'required|string',
         ]);
 
@@ -56,6 +57,7 @@ class ModuleLessonController extends Controller
 
         try {
             $moduleLesson = ModuleLesson::create([
+                'module_id' => $request->get('module_id'),
                 'title' => $request->get('title'),
                 'description' => $request->get('description'),
                 'content' => $request->get('content'),
@@ -77,9 +79,11 @@ class ModuleLessonController extends Controller
     
     public function update(Request $request, $entity) {
         $validator = Validator::make($request->all(), [
-            'title' => 'string|max:200',
-            'description' => 'string|max:255',
+            'module_id' => 'string',
+            'title' => 'string',
+            'description' => 'string',
             'content' => 'string',
+            'status' => 'string',
         ]);
 
         if($validator->fails()){
@@ -91,12 +95,22 @@ class ModuleLessonController extends Controller
         }
 
         try {
+            $isExisted = ModuleLesson::find($entity)->count();
+
+            if (!$isExisted) {
+                return response()->json([
+                    'error'   => true,
+                    'message' => 'Entity data is not found',
+                    'data'    => []
+                ], 400);
+            }
+    
             $moduleLessonTrashed = ModuleLesson::onlyTrashed()->where('id', $entity)->count();
 
             if ($moduleLessonTrashed > 0) {
                 return response()->json([
                     'error'   => true,
-                    'message' => 'Module lesson already deleted',
+                    'message' => 'Course data already deleted',
                     'data'    => [
                         'entity' => $entity
                     ]
@@ -105,6 +119,9 @@ class ModuleLessonController extends Controller
     
             $moduleLessonData = ModuleLesson::find($entity);
 
+            if ($request->get('module_id')) {
+                $moduleLessonData->module_id = $request->get('module_id');
+            }
             if ($request->get('title')) {
                 $moduleLessonData->title = $request->get('title');
             }
@@ -113,6 +130,9 @@ class ModuleLessonController extends Controller
             }
             if ($request->get('content')) {
                 $moduleLessonData->content = $request->get('content');
+            }
+            if ($request->get('status')) {
+                $moduleLessonData->status = $request->get('status');
             }
 
             $moduleLessonData->save();
@@ -138,7 +158,7 @@ class ModuleLessonController extends Controller
             if (!$moduleLessonData) {
                 return response()->json([
                     'error'   => true,
-                    'message' => 'Entity data is not defined',
+                    'message' => 'Entity data is not found',
                     'data'    => []
                 ], 400);
             }
@@ -147,7 +167,7 @@ class ModuleLessonController extends Controller
 
             return response()->json([
                 'error'   => false,
-                'message' => 'Module lesson already deleted',
+                'message' => 'Module lesson data already deleted',
                 'data'    => [
                     'entity' => $entity
                 ]

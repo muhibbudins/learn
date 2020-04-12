@@ -76,7 +76,7 @@ export default {
           },
           {
             name: "Profile",
-            path: "profile"
+            path: "dashboard-profile"
           },
           {
             name: "Logout",

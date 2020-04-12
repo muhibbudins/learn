@@ -2,41 +2,41 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\ModuleQuiz;
+use App\ModuleQuizQuestion;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 use Illuminate\Support\Facades\Validator;
 
-class ModuleQuizController extends Controller
+class ModuleQuizQuestionController extends Controller
 {
-    public function read(Request $request, $entity = null) {
+    public function read(Request $request) {
         $entity = $entity ?? $request->get('entity');
         $includes = $request->get('includes');
         $trashed = $request->get('trashed');
 
         try {
             if ($entity) {
-                $moduleQuiz = ModuleQuiz::find($entity);
-                $moduleQuiz['questions'] = $moduleQuiz->questions;
+                $moduleQuizQuestion = ModuleQuizQuestion::find($entity);
+                $moduleQuizQuestion['questions'] = $moduleQuizQuestion->questions;
 
-                foreach ($moduleQuiz['questions'] as $question) {
+                foreach ($moduleQuizQuestion['questions'] as $question) {
                     $question['choices'] = $question->choices;
                 }
             }
             else if ($trashed) {
-                $moduleQuiz = ModuleQuiz::onlyTrashed()->paginate(30);
+                $moduleQuizQuestion = ModuleQuizQuestion::onlyTrashed()->paginate(30);
             }
             else {
-                $moduleQuiz = ModuleQuiz::paginate(30);
+                $moduleQuizQuestion = ModuleQuizQuestion::paginate(30);
             }
     
-            return response()->json($moduleQuiz, 200);
+            return response()->json($moduleQuizQuestion, 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'error'   => true,
-                'message' => 'Something went wrong when reading a module quiz',
+                'message' => 'Something went wrong when reading a module quiz question',
                 'data'    => []
             ], 500);
         }
@@ -44,7 +44,7 @@ class ModuleQuizController extends Controller
 
     public function create(Request $request) {
         $validator = Validator::make($request->all(), [
-            'module_id' => 'required|string',
+            'module_quiz_id' => 'required|string',
             'title' => 'required|string',
             'content' => 'required|string'
         ]);
@@ -58,21 +58,21 @@ class ModuleQuizController extends Controller
         }
 
         try {
-            $moduleQuiz = ModuleQuiz::create([
-                'module_id' => $request->get('module_id'),
+            $moduleQuizQuestion = ModuleQuizQuestion::create([
+                'module_quiz_id' => $request->get('module_quiz_id'),
                 'title' => $request->get('title'),
                 'content' => $request->get('content'),
             ]);
     
             return response()->json([
                 'error'   => false,
-                'message' => 'Successfully creating a module quiz',
-                'data'    => $moduleQuiz
+                'message' => 'Successfully creating a module quiz question',
+                'data'    => $moduleQuizQuestion
             ], 201);
         } catch (\Throwable $th) {
             return response()->json([
                 'error'   => true,
-                'message' => 'Something went wrong when creating a module quiz',
+                'message' => 'Something went wrong when creating a module quiz question',
                 'data'    => []
             ], 500);
         }
@@ -80,9 +80,10 @@ class ModuleQuizController extends Controller
     
     public function update(Request $request, $entity) {
         $validator = Validator::make($request->all(), [
-            'module_id' => 'string',
+            'module_quiz_id' => 'string',
             'title' => 'string',
             'content' => 'string',
+            'status' => 'string',
         ]);
 
         if($validator->fails()){
@@ -94,7 +95,7 @@ class ModuleQuizController extends Controller
         }
 
         try {
-            $isExisted = ModuleQuiz::find($entity)->count();
+            $isExisted = ModuleQuizQuestion::find($entity)->count();
 
             if (!$isExisted) {
                 return response()->json([
@@ -104,9 +105,9 @@ class ModuleQuizController extends Controller
                 ], 400);
             }
     
-            $moduleQuizTrashed = ModuleQuiz::onlyTrashed()->where('id', $entity)->count();
+            $moduleQuestionTrashed = ModuleQuizQuestion::onlyTrashed()->where('id', $entity)->count();
 
-            if ($moduleQuizTrashed > 0) {
+            if ($moduleQuestionTrashed > 0) {
                 return response()->json([
                     'error'   => true,
                     'message' => 'Course data already deleted',
@@ -116,29 +117,32 @@ class ModuleQuizController extends Controller
                 ], 400);
             }
     
-            $moduleQuizData = ModuleQuiz::find($entity);
+            $moduleQuestionData = ModuleQuizQuestion::find($entity);
 
-            if ($request->get('module_id')) {
-                $moduleQuizData->module_id = $request->get('module_id');
+            if ($request->get('module_quiz_id')) {
+                $moduleQuestionData->module_quiz_id = $request->get('module_quiz_id');
             }
             if ($request->get('title')) {
-                $moduleQuizData->title = $request->get('title');
+                $moduleQuestionData->title = $request->get('title');
             }
             if ($request->get('content')) {
-                $moduleQuizData->content = $request->get('content');
+                $moduleQuestionData->content = $request->get('content');
+            }
+            if ($request->get('status')) {
+                $moduleQuestionData->status = $request->get('status');
             }
 
-            $moduleQuizData->save();
+            $moduleQuestionData->save();
     
             return response()->json([
                 'error'   => false,
-                'message' => 'Successfully updating a modul quiz',
-                'data'    => $moduleQuizData
+                'message' => 'Successfully updating a module question',
+                'data'    => $moduleQuestionData
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'error'   => true,
-                'message' => 'Something went wrong when updating a modul quiz',
+                'message' => 'Something went wrong when updating a module question',
                 'data'    => []
             ], 500);
         }
@@ -146,9 +150,9 @@ class ModuleQuizController extends Controller
 
     public function delete(Request $request, $entity) {
         try {
-            $moduleQuiz = ModuleQuiz::find($entity);
+            $moduleQuizQuestion = ModuleQuizQuestion::find($entity);
 
-            if (!$moduleQuiz) {
+            if (!$moduleQuizQuestion) {
                 return response()->json([
                     'error'   => true,
                     'message' => 'Entity data is not found',
@@ -156,11 +160,11 @@ class ModuleQuizController extends Controller
                 ], 400);
             }
             
-            $moduleQuiz->delete();
+            $moduleQuizQuestion->delete();
 
             return response()->json([
                 'error'   => false,
-                'message' => 'Modul quiz data already deleted',
+                'message' => 'Quiz question data already deleted',
                 'data'    => [
                     'entity' => $entity
                 ]
@@ -168,7 +172,7 @@ class ModuleQuizController extends Controller
         } catch (\Throwable $th) {
             return response()->json([
                 'error'   => true,
-                'message' => 'Something went wrong when deleting a module quiz',
+                'message' => 'Something went wrong when deleting a module quiz question',
                 'data'    => []
             ], 500);
         }

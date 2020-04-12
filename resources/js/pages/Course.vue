@@ -2,24 +2,22 @@
   <div class="container">
     <div class="card card-default">
       <div class="card-body">
-        Halaman Course User
+        <h5>Admin Dashboard</h5>
+        <ListUserCourse />
       </div>
     </div>
   </div>
 </template>
-
 <script>
+import ListUserCourse from "../components/ListUserCourse.vue";
 export default {
-  data() {
-    return {
-      //
-    };
-  },
-  components: {
+  mounted() {
     //
   },
+  components: {
+    ListUserCourse
+  },
   mounted() {
-    // 
   }
 };
 </script>

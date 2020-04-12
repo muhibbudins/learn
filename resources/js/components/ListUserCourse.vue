@@ -7,19 +7,21 @@
     <table class="table">
       <tr>
         <th scope="col">Id</th>
-        <th scope="col">Nom</th>
-        <th scope="col">Email</th>
-        <th scope="col">Date d'inscription</th>
+        <th scope="col">Course</th>
+        <th scope="col">Description</th>
+        <th scope="col">Action</th>
       </tr>
       <tr
-        v-for="courseuser in courseusers"
-        v-bind:key="courseuser.id"
+        v-for="data in courses"
+        v-bind:key="data.id"
         style="margin-bottom: 5px;"
       >
-        <th scope="row">{{ courseuser.id }}</th>
-        <td>{{ courseuser.name }}</td>
-        <td>{{ courseuser.email }}</td>
-        <td>{{ courseuser.created_at }}</td>
+        <th scope="row">{{ data.id }}</th>
+        <td>{{ data.course.title }}</td>
+        <td>{{ data.course.description }}</td>
+        <td>
+          <a href="#" class="btn btn-sm btn-primary">Learn</a>
+        </td>
       </tr>
     </table>
   </div>
@@ -29,7 +31,7 @@ export default {
   data() {
     return {
       has_error: false,
-      courseusers: null
+      courses: null
     };
   },
   mounted() {
@@ -38,11 +40,11 @@ export default {
   methods: {
     getCourseUsers() {
       this.$http({
-        url: `/v1/courseuser`,
+        url: `/v1/user/course`,
         method: "GET"
       }).then(
         res => {
-          this.courseusers = res.data.courseusers;
+          this.courses = res.data;
         },
         () => {
           this.has_error = true;

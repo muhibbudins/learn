@@ -35,6 +35,7 @@ class AuthController extends Controller
                 'name' => $request->get('name'),
                 'email' => $request->get('email'),
                 'password' => Hash::make($request->get('password')),
+                'role' => 'student',
             ]);
 
             return response()->json([
@@ -43,6 +44,7 @@ class AuthController extends Controller
                 'data'    => [
                     'name'  => $request->get('name'),
                     'email' => $request->get('email'),
+                    'role' => 'student',
                 ]
             ], 200);
         } catch (\Throwable $th) {

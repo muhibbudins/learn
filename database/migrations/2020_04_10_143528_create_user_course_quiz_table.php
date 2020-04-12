@@ -16,14 +16,14 @@ class CreateUserCourseQuizTable extends Migration
         Schema::create('user_course_quizzes', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('user_course_id');
-            $table->unsignedBigInteger('module_quiz_id');
+            $table->unsignedBigInteger('module_quiz_question_id');
             $table->unsignedBigInteger('module_quiz_choice_id')->nullable();
             $table->string('essay')->nullable();
             $table->timestamps();
             $table->softDeletes();
 
             $table->foreign('user_course_id')->references('id')->on('user_courses');
-            $table->foreign('module_quiz_id')->references('id')->on('module_quizzes');
+            $table->foreign('module_quiz_question_id')->references('id')->on('module_quiz_questions');
             $table->foreign('module_quiz_choice_id')->references('id')->on('module_quiz_choices');
         });
     }

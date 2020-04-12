@@ -41,7 +41,7 @@ class ModuleQuizChoiceController extends Controller
 
     public function create(Request $request) {
         $validator = Validator::make($request->all(), [
-            'module_quiz_id' => 'required|string',
+            'module_quiz_question_id' => 'required|string',
             'content' => 'required|string',
             'answer' => 'required|string',
         ]);
@@ -56,7 +56,7 @@ class ModuleQuizChoiceController extends Controller
 
         try {
             $moduleQuizChoices = ModuleQuizChoices::create([
-                'module_quiz_id' => $request->get('module_quiz_id'),
+                'module_quiz_question_id' => $request->get('module_quiz_question_id'),
                 'content' => $request->get('content'),
                 'answer' => $request->get('answer'),
             ]);
@@ -77,7 +77,7 @@ class ModuleQuizChoiceController extends Controller
     
     public function update(Request $request, $entity) {
         $validator = Validator::make($request->all(), [
-            'module_quiz_id' => 'string',
+            'module_quiz_question_id' => 'string',
             'content' => 'string',
             'answer' => 'string',
         ]);
@@ -91,41 +91,51 @@ class ModuleQuizChoiceController extends Controller
         }
 
         try {
-            $moduleQuizChoicesTrashed = ModuleQuizChoices::onlyTrashed()->where('id', $entity)->count();
+            $isExisted = ModuleQuizChoices::find($entity)->count();
 
-            if ($moduleQuizChoicesTrashed > 0) {
+            if (!$isExisted) {
                 return response()->json([
                     'error'   => true,
-                    'message' => 'Module quiz choices already deleted',
+                    'message' => 'Entity data is not found',
+                    'data'    => []
+                ], 400);
+            }
+    
+            $moduleQuizChoiceTrashed = ModuleQuizChoices::onlyTrashed()->where('id', $entity)->count();
+
+            if ($moduleQuizChoiceTrashed > 0) {
+                return response()->json([
+                    'error'   => true,
+                    'message' => 'Course data already deleted',
                     'data'    => [
                         'entity' => $entity
                     ]
                 ], 400);
             }
     
-            $moduleQuizChoicesData = ModuleQuizChoices::find($entity);
+            $moduleQuizChoiceData = ModuleQuizChoices::find($entity);
 
-            if ($request->get('module_quiz_id')) {
-                $moduleQuizChoicesData->module_quiz_id = $request->get('module_quiz_id');
+            if ($request->get('module_quiz_question_id')) {
+                $moduleQuizChoiceData->module_quiz_question_id = $request->get('module_quiz_question_id');
             }
             if ($request->get('content')) {
-                $moduleQuizChoicesData->content = $request->get('content');
+                $moduleQuizChoiceData->content = $request->get('content');
             }
-            if ($request->get('answer')) {
-                $moduleQuizChoicesData->answer = $request->get('answer');
+            if ($request->get('answer') !== null) {
+                $moduleQuizChoiceData->answer = $request->get('answer');
             }
 
-            $moduleQuizChoicesData->save();
+            $moduleQuizChoiceData->save();
     
             return response()->json([
                 'error'   => false,
-                'message' => 'Successfully updating a module quiz choices',
-                'data'    => $moduleQuizChoicesData
+                'message' => 'Successfully updating a quiz choice',
+                'data'    => $moduleQuizChoiceData
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'error'   => true,
-                'message' => 'Something went wrong when updating a module quiz choices',
+                'message' => 'Something went wrong when updating a quiz choice',
                 'data'    => []
             ], 500);
         }
@@ -138,7 +148,7 @@ class ModuleQuizChoiceController extends Controller
             if (!$moduleQuizChoicesData) {
                 return response()->json([
                     'error'   => true,
-                    'message' => 'Entity data is not defined',
+                    'message' => 'Entity data is not found',
                     'data'    => []
                 ], 400);
             }
@@ -147,7 +157,7 @@ class ModuleQuizChoiceController extends Controller
 
             return response()->json([
                 'error'   => false,
-                'message' => 'Module quiz choices already deleted',
+                'message' => 'Module quiz choices data already deleted',
                 'data'    => [
                     'entity' => $entity
                 ]

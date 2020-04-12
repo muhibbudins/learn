@@ -42,8 +42,6 @@ class ModuleController extends Controller
     public function create(Request $request) {
         $validator = Validator::make($request->all(), [
             'course_id' => 'string',
-            'module_lesson_id' => 'string',
-            'module_quiz_id' => 'string',
             'title' => 'required|string',
             'description' => 'required|string',
         ]);
@@ -56,11 +54,9 @@ class ModuleController extends Controller
             ], 400);
         }
 
-        // try {
+        try {
             $module = Module::create([
                 'course_id' => $request->get('course_id'),
-                'module_lesson_id' => $request->get('module_lesson_id'),
-                'module_quiz_id' => $request->get('module_quiz_id'),
                 'title' => $request->get('title'),
                 'description' => $request->get('description'),
             ]);
@@ -70,20 +66,18 @@ class ModuleController extends Controller
                 'message' => 'Successfully creating a module',
                 'data'    => $module
             ], 201);
-        // } catch (\Throwable $th) {
-        //     return response()->json([
-        //         'error'   => true,
-        //         'message' => 'Something went wrong when creating a module',
-        //         'data'    => []
-        //     ], 500);
-        // }
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error'   => true,
+                'message' => 'Something went wrong when creating a module',
+                'data'    => []
+            ], 500);
+        }
     }
     
     public function update(Request $request, $entity) {
         $validator = Validator::make($request->all(), [
             'course_id' => 'string',
-            'module_lesson_id' => 'string',
-            'module_quiz_id' => 'string',
             'title' => 'string',
             'description' => 'string',
             'status' => 'string',
@@ -98,45 +92,49 @@ class ModuleController extends Controller
         }
 
         try {
-            $module = Module::onlyTrashed()->where('id', $entity)->count();
+            $isExisted = Module::find($entity)->count();
 
-            if ($module > 0) {
+            if (!$isExisted) {
                 return response()->json([
                     'error'   => true,
-                    'message' => 'Course already deleted',
+                    'message' => 'Entity data is not found',
+                    'data'    => []
+                ], 400);
+            }
+    
+            $moduleTrashed = Module::onlyTrashed()->where('id', $entity)->count();
+
+            if ($moduleTrashed > 0) {
+                return response()->json([
+                    'error'   => true,
+                    'message' => 'Course data already deleted',
                     'data'    => [
                         'entity' => $entity
                     ]
                 ], 400);
             }
     
-            $module = Module::find($entity);
+            $moduleData = Module::find($entity);
 
             if ($request->get('course_id')) {
-                $module->course_id = $request->get('course_id');
-            }
-            if ($request->get('module_lesson_id')) {
-                $module->module_lesson_id = $request->get('module_lesson_id');
-            }
-            if ($request->get('module_quiz_id')) {
-                $module->quiz_id = $request->get('module_quiz_id');
+                $moduleData->course_id = $request->get('course_id');
             }
             if ($request->get('title')) {
-                $module->title = $request->get('title');
+                $moduleData->title = $request->get('title');
             }
             if ($request->get('description')) {
-                $module->description = $request->get('description');
+                $moduleData->description = $request->get('description');
             }
             if ($request->get('status')) {
-                $module->status = $request->get('status');
+                $moduleData->status = $request->get('status');
             }
 
-            $module->save();
+            $moduleData->save();
     
             return response()->json([
                 'error'   => false,
                 'message' => 'Successfully updating a module',
-                'data'    => $module
+                'data'    => $moduleData
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
@@ -154,7 +152,7 @@ class ModuleController extends Controller
             if (!$module) {
                 return response()->json([
                     'error'   => true,
-                    'message' => 'Entity data is not defined',
+                    'message' => 'Entity data is not found',
                     'data'    => []
                 ], 400);
             }
@@ -163,7 +161,7 @@ class ModuleController extends Controller
 
             return response()->json([
                 'error'   => false,
-                'message' => 'Course already deleted',
+                'message' => 'Course data already deleted',
                 'data'    => [
                     'entity' => $entity
                 ]

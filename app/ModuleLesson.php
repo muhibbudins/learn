@@ -15,6 +15,7 @@ class ModuleLesson extends Model
    * @var array
    */
   protected $fillable = [
+    'module_id',
     'title',
     'description',
     'content',

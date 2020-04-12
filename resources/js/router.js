@@ -5,10 +5,12 @@ const Home = require("./pages/Home").default;
 const Register = require("./pages/Register").default;
 const Login = require("./pages/Login").default;
 const Course = require("./pages/Course").default;
+const Profile = require("./pages/Profile").default;
 const Dashboard = require("./pages/admin/Dashboard").default;
 const DashboardCourse = require("./pages/admin/Course").default;
-const DashboardUserCourse = require("./pages/admin/UserCourse").default;
+const DashboardProfile = require("./pages/admin/Profile").default;
 const DashboardUser = require("./pages/admin/User").default;
+const DashboardUserCourse = require("./pages/admin/UserCourse").default;
 
 const authAdmin = {
   auth: {
@@ -29,6 +31,14 @@ const routes = [
     path: "/courses",
     name: "courses",
     component: Course,
+    meta: {
+      auth: true
+    }
+  },
+  {
+    path: "/profile",
+    name: "profile",
+    component: Profile,
     meta: {
       auth: true
     }
@@ -60,9 +70,9 @@ const routes = [
     }
   },
   {
-    path: "/dashboard/user-course",
-    name: "dashboard-user-course",
-    component: DashboardUserCourse,
+    path: "/dashboard/profile",
+    name: "dashboard-profile",
+    component: DashboardProfile,
     meta: {
       ...authAdmin
     }
@@ -71,6 +81,14 @@ const routes = [
     path: "/dashboard/user",
     name: "dashboard-user",
     component: DashboardUser,
+    meta: {
+      ...authAdmin
+    }
+  },
+  {
+    path: "/dashboard/user-course",
+    name: "dashboard-user-course",
+    component: DashboardUserCourse,
     meta: {
       ...authAdmin
     }

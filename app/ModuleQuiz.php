@@ -15,16 +15,22 @@ class ModuleQuiz extends Model
    * @var array
    */
   protected $fillable = [
+    'module_id',
     'title',
     'content',
-    'status',
   ];
 
   /**
-   * Get the choices for the quiz.
+   * Get the questions for the group.
    */
-  public function choices()
+  public function questions()
   {
-      return $this->hasMany('App\ModuleQuizChoices');
+      return $this->hasMany('App\ModuleQuizQuestion')->select(
+        'id',
+        'module_quiz_id',
+        'title',
+        'content',
+        'status'
+      );
   }
 }

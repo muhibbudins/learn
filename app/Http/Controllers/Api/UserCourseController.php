@@ -12,6 +12,41 @@ use Illuminate\Support\Facades\Validator;
 
 class UserCourseController extends Controller
 {
+    public function leave(Request $request, $course) {
+        try {
+            $courseParameter = [
+                'user_id' => Auth::user()->id,
+                'course_id' => $course
+            ];
+
+            $isExisted = UserCourse::where($courseParameter)->count();
+
+            if (!$isExisted) {
+                return response()->json([
+                    'error'   => true,
+                    'message' => 'You\'re already leaving the course',
+                    'data'    => []
+                ], 400);
+            }
+
+            UserCourse::where($courseParameter)->delete();
+
+            return response()->json([
+                'error'   => false,
+                'message' => 'Successfully leaving the couse',
+                'data'    => [
+                    'entity' => $course
+                ]
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error'   => true,
+                'message' => 'Something went wrong when deleting a user course',
+                'data'    => []
+            ], 500);
+        }
+    }
+
     public function read(Request $request) {
         $entity = $request->get('entity');
         $includes = $request->get('includes');
@@ -24,14 +59,25 @@ class UserCourseController extends Controller
                 $userCourseData = UserCourse::where('user_id', Auth::user()->id)->get();
 
                 foreach ($userCourseData as $userCourse) {
-                    $userCourse['course'] = $userCourse->course;
-                    $userCourses[] = $userCourse;
+                    $userCourses[] = $userCourse->course;
                 }
+
+                $userCourses = [
+                    'error'   => false,
+                    'message' => 'Successfully reading a user course',
+                    'data'    => $userCourses
+                ];
             } else {
                 if ($entity) {
                     $userCourses = UserCourse::find($entity);
                     $userCourses['user'] = $userCourses->user;
                     $userCourses['course'] = $userCourses->course;
+
+                    $userCourses = [
+                        'error'   => false,
+                        'message' => 'Successfully reading a user course',
+                        'data'    => $userCourses
+                    ];
                 }
                 else if ($includes) {
                     $userCourses = [];
@@ -42,6 +88,12 @@ class UserCourseController extends Controller
                         $userCourse['course'] = $userCourse->course;
                         $userCourses[] = $userCourse;
                     }
+
+                    $userCourses = [
+                        'error'   => false,
+                        'message' => 'Successfully reading a user course',
+                        'data'    => $userCourses
+                    ];
                 }
                 else if ($trashed) {
                     $userCourses = UserCourse::onlyTrashed()->paginate(30);
@@ -76,6 +128,21 @@ class UserCourseController extends Controller
         }
 
         try {
+            $isExisted = UserCourse::withTrashed()->where([
+                'user_id' => $request->get('user_id'),
+                'course_id' => $request->get('course_id')
+            ])->count();
+
+            if ($isExisted) {
+                $responseMessage = Auth::user()->role !== 'admin' ? 'You\'re' : 'This user' ;
+
+                return response()->json([
+                    'error'   => true,
+                    'message' => $responseMessage . ' already joined the course',
+                    'data'    => []
+                ], 400);
+            }
+
             $userCourse = UserCourse::create([
                 'user_id' => $request->get('user_id'),
                 'course_id' => $request->get('course_id')
@@ -97,8 +164,8 @@ class UserCourseController extends Controller
     
     public function update(Request $request, $entity) {
         $validator = Validator::make($request->all(), [
-            'user_id' => 'string',
             'course_id' => 'string',
+            'user_id' => 'string',
         ]);
 
         if($validator->fails()){
@@ -110,25 +177,50 @@ class UserCourseController extends Controller
         }
 
         try {
+            $isExisted = UserCourse::find($entity)->count();
+
+            if (!$isExisted) {
+                return response()->json([
+                    'error'   => true,
+                    'message' => 'Entity data is not found',
+                    'data'    => []
+                ], 400);
+            }
+    
             $userCourseTrashed = UserCourse::onlyTrashed()->where('id', $entity)->count();
 
             if ($userCourseTrashed > 0) {
                 return response()->json([
                     'error'   => true,
-                    'message' => 'Course already deleted',
+                    'message' => 'User course data already deleted',
                     'data'    => [
                         'entity' => $entity
                     ]
                 ], 400);
             }
     
+            $isExisted = UserCourse::withTrashed()->where([
+                'user_id' => $request->get('user_id'),
+                'course_id' => $request->get('course_id')
+            ])->count();
+
+            if ($isExisted) {
+                $responseMessage = Auth::user()->role !== 'admin' ? 'You\'re' : 'This user' ;
+
+                return response()->json([
+                    'error'   => true,
+                    'message' => $responseMessage . ' already joined the course',
+                    'data'    => []
+                ], 400);
+            }
+
             $userCourseData = UserCourse::find($entity);
 
-            if ($request->get('user_id')) {
-                $userCourseData->user_id = $request->get('user_id');
-            }
             if ($request->get('course_id')) {
                 $userCourseData->course_id = $request->get('course_id');
+            }
+            if ($request->get('user_id')) {
+                $userCourseData->user_id = $request->get('user_id');
             }
 
             $userCourseData->save();
@@ -154,7 +246,7 @@ class UserCourseController extends Controller
             if (!$userCourseData) {
                 return response()->json([
                     'error'   => true,
-                    'message' => 'Entity data is not defined',
+                    'message' => 'Entity data is not found',
                     'data'    => []
                 ], 400);
             }
@@ -163,7 +255,7 @@ class UserCourseController extends Controller
 
             return response()->json([
                 'error'   => false,
-                'message' => 'Course already deleted',
+                'message' => 'User course data already deleted',
                 'data'    => [
                     'entity' => $entity
                 ]

@@ -16,6 +16,17 @@ class UserController extends Controller
     public function me(Request $request)
     {
         $userData = User::find(Auth::user()->id);
+
+        return response()->json([
+            'error'   => false,
+            'message' => 'Successfully reading a user data',
+            'data'    => $userData,
+        ]);
+    }
+
+    public function meWithDetail(Request $request)
+    {
+        $userData = User::find(Auth::user()->id);
         $userData['courses'] = $userData->courses;
 
         foreach ($userData['courses'] as $userCourse) {
@@ -27,6 +38,100 @@ class UserController extends Controller
             'message' => 'Successfully reading a user data',
             'data'    => $userData,
         ]);
+    }
+    
+    public function meUpdate(Request $request, $entity) {
+        if ($entity != Auth::user()->id) {
+            return response()->json([
+                'error' => true,
+                'messages' => 'You can\'t change other user data',
+                'data' => [],
+            ], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'string',
+            'password' => 'min:3|confirmed',
+            'firstname' => 'string',
+            'lastname' => 'string',
+            'address' => 'string',
+        ]);
+
+        if($validator->fails()){
+            return response()->json([
+                'error' => true,
+                'messages' => $validator->errors(),
+                'data' => $request->all(),
+            ], 400);
+        }
+
+        try {
+            $userTrashed = User::onlyTrashed()->where('id', $entity)->count();
+
+            if ($userTrashed > 0) {
+                return response()->json([
+                    'error'   => true,
+                    'message' => 'User data already deleted',
+                    'data'    => [
+                        'entity' => $entity
+                    ]
+                ], 400);
+            }
+    
+            $userData = User::find($entity);
+
+            if ($request->get('name')) {
+                $userData->name = $request->get('name');
+            }
+            if ($request->get('password')) {
+                $userData->password = $request->get('password');
+            }
+            if ($request->get('firstname')) {
+                $userData->firstname = $request->get('firstname');
+            }
+            if ($request->get('lastname')) {
+                $userData->lastname = $request->get('lastname');
+            }
+            if ($request->get('address')) {
+                $userData->address = $request->get('address');
+            }
+
+            $userData->save();
+    
+            return response()->json([
+                'error'   => false,
+                'message' => 'Successfully updating a user',
+                'data'    => $userData
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error'   => true,
+                'message' => 'Something went wrong when updating a user',
+                'data'    => []
+            ], 500);
+        }
+    }
+
+    public function reportCount(Request $request) {
+        try {
+            $adminCount = User::where('role', 'admin')->count();
+            $studentCount = User::where('role', 'student')->count();
+
+            return response()->json([
+                'error'   => false,
+                'message' => 'Successfully creating a report for student',
+                'data'    => [
+                    'admin' => $adminCount,
+                    'student' => $studentCount,
+                ]
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error'   => true,
+                'message' => 'Something went wrong when reporting student',
+                'data'    => []
+            ], 500);
+        }
     }
 
     public function read(Request $request) {
@@ -67,6 +172,7 @@ class UserController extends Controller
             'name'     => 'required|string',
             'email'    => 'required|email|unique:users',
             'password' => 'required|min:3|confirmed',
+            'role' => 'string',
         ]);
 
         if($validator->fails()){
@@ -82,6 +188,7 @@ class UserController extends Controller
                 'name' => $request->get('name'),
                 'email' => $request->get('email'),
                 'password' => Hash::make($request->get('password')),
+                'role' => $request->get('role') ?? 'student',
             ]);
     
             return response()->json([
@@ -107,7 +214,7 @@ class UserController extends Controller
             'firstname' => 'string',
             'lastname' => 'string',
             'address' => 'string',
-            'status' => 'boolean',
+            'status' => 'string',
         ]);
 
         if($validator->fails()){
@@ -119,12 +226,22 @@ class UserController extends Controller
         }
 
         try {
+            $isExisted = User::find($entity)->count();
+
+            if (!$isExisted) {
+                return response()->json([
+                    'error'   => true,
+                    'message' => 'Entity data is not found',
+                    'data'    => []
+                ], 400);
+            }
+    
             $userTrashed = User::onlyTrashed()->where('id', $entity)->count();
 
             if ($userTrashed > 0) {
                 return response()->json([
                     'error'   => true,
-                    'message' => 'User already deleted',
+                    'message' => 'Course data already deleted',
                     'data'    => [
                         'entity' => $entity
                     ]
@@ -140,7 +257,7 @@ class UserController extends Controller
                 $userData->email = $request->get('email');
             }
             if ($request->get('password')) {
-                $userData->password = $request->get('password');
+                $userData->password = Hash::make($request->get('password'));
             }
             if ($request->get('role')) {
                 $userData->role = $request->get('role');
@@ -181,7 +298,7 @@ class UserController extends Controller
             if (!$userData) {
                 return response()->json([
                     'error'   => true,
-                    'message' => 'Entity data is not defined',
+                    'message' => 'Entity data is not found',
                     'data'    => []
                 ], 400);
             }
@@ -190,7 +307,7 @@ class UserController extends Controller
 
             return response()->json([
                 'error'   => false,
-                'message' => 'User already deleted',
+                'message' => 'User data already deleted',
                 'data'    => [
                     'entity' => $entity
                 ]

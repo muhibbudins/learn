@@ -9,22 +9,22 @@ const config = {
   router: router,
   tokenDefaultName: "e-learning",
   rolesKey: "role",
-  registerData: { url: "v1/register", method: "POST", redirect: "/login" },
+  registerData: { url: "v1/auth/register", method: "POST", redirect: "/login" },
   loginData: {
-    url: "v1/login",
+    url: "v1/auth/login",
     method: "POST",
     redirect: "/",
     fetchUser: true
   },
   logoutData: {
-    url: "v1/logout",
+    url: "v1/auth/logout",
     method: "POST",
     redirect: "/login",
     makeRequest: true
   },
-  fetchData: { url: "v1/me", method: "GET", enabled: true },
+  fetchData: { url: "v1/account/me", method: "GET", enabled: true },
   refreshData: {
-    url: "v1/refresh",
+    url: "v1/auth/refresh",
     method: "GET",
     enabled: true,
     interval: 30

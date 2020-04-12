@@ -15,11 +15,13 @@ class CreateModuleQuizTable extends Migration
     {
         Schema::create('module_quizzes', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->unsignedBigInteger('module_id');
             $table->string('title');
             $table->text('content');
-            $table->boolean('status')->default(false);
             $table->timestamps();
             $table->softDeletes();
+
+            $table->foreign('module_id')->references('id')->on('modules');
         });
     }
 

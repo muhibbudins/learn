@@ -16,7 +16,7 @@ class UserCourseQuiz extends Model
    */
   protected $fillable = [
     'user_course_id',
-    'module_quiz_id',
+    'module_quiz_question_id',
     'module_quiz_choice_id',
     'essay',
   ];
