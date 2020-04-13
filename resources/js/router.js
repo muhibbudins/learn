@@ -101,16 +101,22 @@ const routes = [
 
   // Room
   {
-    path: "/room/:course/:user_course",
+    path: "/room/:course/:user_course/:type/:order",
     name: "room",
-    component: Room
+    component: Room,
+    meta: {
+      auth: true
+    }
   },
 
   // Student
   {
     path: "/student",
     name: "student",
-    component: Student
+    component: Student,
+    meta: {
+      auth: true
+    }
   },
   {
     path: "/student/courses",

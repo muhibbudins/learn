@@ -28,6 +28,7 @@
     "es6-promise": "^4.2.8",
     "marked": "^0.8.2",
     "vue-axios": "^2.1.5",
+    "vue-feather-icons": "^5.0.0",
     "vue-router": "^3.1.6"
   }
 }

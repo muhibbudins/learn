@@ -4,7 +4,10 @@
       <h4>{{ userCourse.course.title }}</h4>
       <div class="mb-3">{{ userCourse.course.description }}</div>
       <div class="text-muted mb-3">{{ userCourse.course.created_at }}</div>
-      <button class="btn btn-primary btn-block" @click="$router.push(`/room/${userCourse.course_id}/${userCourse.course.id}`)">
+      <button
+        class="btn btn-primary btn-block"
+        @click="$router.push(`/room/${userCourse.course_id}/${userCourse.course.id}/course/0`)"
+      >
         Start Learning
       </button>
     </div>

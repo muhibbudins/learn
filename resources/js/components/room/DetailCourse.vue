@@ -1,0 +1,59 @@
+<template>
+  <div class="row">
+    <div class="col-7">
+      <h6 class="text-muted">About</h6>
+      <h4>{{ content.title }}</h4>
+      <p>{{ content.created_at }}</p>
+      <div v-if="content.content" v-html="compileToHTML(content.content)"></div>
+    </div>
+    <div class="col-5">
+      <h6 class="text-muted">Table Of Contents:</h6>
+      <ol v-if="content.modules">
+        <li v-for="modules in content.modules" :key="modules.id">
+          <p>{{ modules.title }}</p>
+          <p>{{ modules.description }}</p>
+          <div v-if="modules.lessons.length > 0">
+            <h6 class="text-muted">Lessons:</h6>
+            <ul>
+              <li v-for="lessons in modules.lessons" :key="lessons.id">
+                <p>{{ lessons.title }}</p>
+                <p>{{ lessons.description }}</p>
+              </li>
+            </ul>
+          </div>
+          <div v-else>This module doesn't have lessons</div>
+
+          <div v-if="modules.quizzes.length > 0">
+            <h6 class="text-muted">Quizzes:</h6>
+            <ul>
+              <li v-for="quizzes in modules.quizzes" :key="quizzes.id">
+                <p>{{ quizzes.title }}</p>
+                <p>{{ quizzes.description }}</p>
+              </li>
+            </ul>
+          </div>
+          <div v-else>This module doesn't have quizzes</div>
+        </li>
+        <li>Finish</li>
+      </ol>
+    </div>
+  </div>
+</template>
+
+<script>
+import markdown from 'marked';
+
+export default {
+  props: {
+    content: {
+      type: [Object, Array],
+      default: () => {}
+    }
+  },
+  methods: {
+    compileToHTML(text) {
+      return markdown(text, { sanitize: true })
+    }
+  }
+};
+</script>
