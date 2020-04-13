@@ -89,9 +89,8 @@ Route::middleware(['administrator'])->prefix('v1')->group(function () {
     */
     Route::prefix('report')->group(function () {
         Route::get('course/total', 'Api\CourseController@reportTotal');
-        Route::get('course/follower', 'Api\CourseController@reportFollower');
-        Route::get('course/accessed', 'Api\CourseController@reportAccessed');
-        Route::get('student', 'Api\UserController@reportCount');
+        Route::get('course/follower', 'Api\UserCourseController@reportFollower');
+        Route::get('user', 'Api\UserController@reportCount');
     });
 
     /*

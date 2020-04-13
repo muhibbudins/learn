@@ -114,16 +114,51 @@ class UserController extends Controller
 
     public function reportCount(Request $request) {
         try {
-            $adminCount = User::where('role', 'admin')->count();
-            $studentCount = User::where('role', 'student')->count();
+            $allReport = [];
+            $allReportTemp = [];
+            $allReportRoles = [];
+            $allUsers = User::where('created_at', '>', 'DATE_SUB(NOW(), INTERVAL 1 YEAR)')->selectRaw('DATE(created_at) as date, role')->get();
+
+            foreach ($allUsers as $user) {
+                $timestamp = strtotime($user->date);
+
+                $allReportRoles[$user->role] = true;
+
+                if (isset($allReportTemp[$timestamp]) && count($allReportTemp[$timestamp]) > 0) {
+                    if (isset($allReportTemp[$timestamp][$user->role])) {
+                        $allReportTemp[$timestamp][$user->role]++;
+                    }
+                }
+                if (!isset($allReportTemp[$timestamp])){
+                    $allReportTemp[$timestamp] = [];
+                }
+                if (!isset($allReportTemp[$timestamp][$user->role])){
+                    $allReportTemp[$timestamp][$user->role] = 1;
+                }
+            }
+
+            foreach ($allReportRoles as $role => $value) {
+                $normalized = [];
+
+                foreach ($allReportTemp as $time => $data) {
+                    $dataValue = $data[$role] ?? 0;
+
+                    $normalized[] = [
+                        $time * 1000,
+                        $dataValue
+                    ];
+                }
+
+                $allReport[] = [
+                    'name' => ucfirst($role),
+                    'data' => $normalized
+                ];
+            }
 
             return response()->json([
                 'error'   => false,
                 'message' => 'Successfully creating a report for student',
-                'data'    => [
-                    'admin' => $adminCount,
-                    'student' => $studentCount,
-                ]
+                'data'    => $allReport
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([

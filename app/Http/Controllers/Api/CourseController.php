@@ -171,42 +171,6 @@ class CourseController extends Controller
         }
     }
 
-    public function reportFollower(Request $request) {
-        try {
-            $courseData = Course::count();
-
-            return response()->json([
-                'error'   => false,
-                'message' => 'Successfully creating a report for follower',
-                'data'    => $courseData
-            ], 200);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'error'   => true,
-                'message' => 'Something went wrong when reporting follower',
-                'data'    => []
-            ], 500);
-        }
-    }
-
-    public function reportAccessed(Request $request) {
-        try {
-            $courseData = Course::count();
-
-            return response()->json([
-                'error'   => false,
-                'message' => 'Successfully creating a report for accessed',
-                'data'    => $courseData
-            ], 200);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'error'   => true,
-                'message' => 'Something went wrong when reporting accessed',
-                'data'    => []
-            ], 500);
-        }
-    }
-
     public function read(Request $request) {
         $entity = $request->get('entity');
         $includes = $request->get('includes');

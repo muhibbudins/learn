@@ -133,6 +133,30 @@ class UserCourseController extends Controller
         }
     }
 
+    public function reportFollower(Request $request) {
+        try {
+            $followerCount = UserCourse::groupBy('course_id')->selectRaw('count(id) as followers, course_id')->get();
+
+            foreach($followerCount as $course) {
+                $course['course'] = $course->course;
+                $course['course_title'] = $course['course']['title'];
+                unset($course['course']);
+            }
+
+            return response()->json([
+                'error'   => false,
+                'message' => 'Successfully creating a report for accessed',
+                'data'    => $followerCount
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error'   => true,
+                'message' => 'Something went wrong when reporting accessed',
+                'data'    => []
+            ], 500);
+        }
+    }
+
     public function leave(Request $request, $course) {
         try {
             $courseParameter = [

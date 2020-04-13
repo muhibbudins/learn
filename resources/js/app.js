@@ -12,6 +12,7 @@ import Vue from "vue"
 import VueAuth from "@websanova/vue-auth"
 import VueAxios from "vue-axios"
 import VueRouter from "vue-router"
+import VueApexCharts from 'vue-apexcharts'
 import Index from "./Index"
 import auth from "./auth"
 import router from "./router"
@@ -30,6 +31,8 @@ Vue.use(VueAxios, axios);
 axios.defaults.baseURL = `${process.env.MIX_APP_URL}/api`;
 
 Vue.use(VueAuth, auth);
+
+Vue.component('apexchart', VueApexCharts)
 
 /**
  * The following block of code may be used to automatically register your

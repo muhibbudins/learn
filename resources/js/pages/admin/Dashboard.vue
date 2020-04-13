@@ -5,11 +5,7 @@
         <div>Dashboard</div>
       </div>
     </div>
-    <div class="card card-default">
-      <div class="card-body">
-        <Report />
-      </div>
-    </div>
+    <Report />
   </div>
 </template>
 <script>
