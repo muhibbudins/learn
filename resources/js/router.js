@@ -1,11 +1,11 @@
 const VueRouter = require("vue-router").default;
 
 // Admin Pages
-const Dashboard = require("./pages/admin/dashboard").default;
-const DashboardUser = require("./pages/admin/user").default;
-const DashboardCourse = require("./pages/admin/course").default;
-const DashboardProfile = require("./pages/admin/profile").default;
-const DashboardUserCourse = require("./pages/admin/user-course").default;
+const Dashboard = require("./pages/administrator/dashboard").default;
+const DashboardUser = require("./pages/administrator/user").default;
+const DashboardCourse = require("./pages/administrator/course").default;
+const DashboardProfile = require("./pages/administrator/profile").default;
+const DashboardUserCourse = require("./pages/administrator/user-course").default;
 
 // Authentication
 const Login = require("./pages/auth/login").default;
