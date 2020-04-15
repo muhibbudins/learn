@@ -29,7 +29,11 @@ class ModuleLessonController extends Controller
                 $moduleLessons = ModuleLesson::paginate(30);
             }
     
-            return response()->json($moduleLessons, 200);
+            return response()->json([
+                'error'   => false,
+                'message' => 'Successfully reading a module of class',
+                'data'    => $moduleLessons
+            ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'error'   => true,

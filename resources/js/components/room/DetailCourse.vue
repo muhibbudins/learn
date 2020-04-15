@@ -1,43 +1,56 @@
 <template>
-  <div class="row">
-    <div class="col-7">
-      <h6 class="text-muted">About</h6>
-      <h4>{{ content.title }}</h4>
-      <p>{{ content.created_at }}</p>
-      <div v-if="content.content" v-html="compileToHTML(content.content)"></div>
-    </div>
-    <div class="col-5">
-      <h6 class="text-muted">Table Of Contents:</h6>
-      <ol v-if="content.modules">
-        <li v-for="modules in content.modules" :key="modules.id">
-          <p>{{ modules.title }}</p>
-          <p>{{ modules.description }}</p>
-          <div v-if="modules.lessons.length > 0">
-            <h6 class="text-muted">Lessons:</h6>
-            <ul>
-              <li v-for="lessons in modules.lessons" :key="lessons.id">
-                <p>{{ lessons.title }}</p>
-                <p>{{ lessons.description }}</p>
-              </li>
-            </ul>
+  <section>
+    <div class="card card-default mb-3">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-7">
+            <h6 class="text-muted">About</h6>
+            <h4>{{ content.title }}</h4>
+            <p>{{ content.created_at }}</p>
+            <div v-if="content.content" v-html="compileToHTML(content.content)"></div>
           </div>
-          <div v-else>This module doesn't have lessons</div>
+          <div class="col-5">
+            <h6 class="text-muted">Table Of Contents:</h6>
+            <ol v-if="content.modules">
+              <li v-for="modules in content.modules" :key="modules.id">
+                <h5>{{ modules.title }}</h5>
+                <p>{{ modules.description }}</p>
+                <div v-if="modules.lessons.length > 0">
+                  <h6 class="text-muted">Lessons:</h6>
+                  <ul>
+                    <li v-for="lessons in modules.lessons" :key="lessons.id">
+                      <p>{{ lessons.title }}</p>
+                      <p>{{ lessons.description }}</p>
+                    </li>
+                  </ul>
+                </div>
+                <div v-else>This module doesn't have lessons</div>
 
-          <div v-if="modules.quizzes.length > 0">
-            <h6 class="text-muted">Quizzes:</h6>
-            <ul>
-              <li v-for="quizzes in modules.quizzes" :key="quizzes.id">
-                <p>{{ quizzes.title }}</p>
-                <p>{{ quizzes.description }}</p>
+                <div v-if="modules.quizzes.length > 0">
+                  <h6 class="text-muted">Quizzes:</h6>
+                  <ul>
+                    <li v-for="quizzes in modules.quizzes" :key="quizzes.id">
+                      <p>{{ quizzes.title }}</p>
+                      <p>{{ quizzes.description }}</p>
+                    </li>
+                  </ul>
+                </div>
+                <div v-else>This module doesn't have quizzes</div>
               </li>
-            </ul>
+              <li><h5>Finish</h5></li>
+            </ol>
           </div>
-          <div v-else>This module doesn't have quizzes</div>
-        </li>
-        <li>Finish</li>
-      </ol>
+        </div>
+      </div>
     </div>
-  </div>
+    <!-- <div class="card card-default">
+      <div class="card-body text-center">
+        <button class="btn btn-outline-primary">
+          Start Learning
+        </button>
+      </div>
+    </div> -->
+  </section>
 </template>
 
 <script>

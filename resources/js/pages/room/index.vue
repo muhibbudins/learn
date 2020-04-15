@@ -5,69 +5,62 @@
         Class Room
       </div>
     </div>
-    <div class="timeline">
+    <div v-if="!is_loading" class="timeline">
       <div
-        class="timeline-start"
-        @click="openPage(param_course, param_user_course, 'course', 0)"
+        class="timeline-start state-completed"
+        :class="{
+          'state-current': detectPage(false, param_course, param_user_course, 0, 'course', 0)
+        }"
+        @click="detectPage(true, param_course, param_user_course, 0, 'course', 0)"
       >
         <HomeIcon />
       </div>
       <div
         class="timeline-module"
-        v-for="modules in course.modules"
-        :key="`modules-${modules.id}`"
+        v-for="(modules, moduleId) in status.modules"
+        :key="`modules-${moduleId}`"
       >
         <div
           class="timeline-module_state"
-          v-for="lessons in modules.lessons"
-          :key="`lessons-${lessons.id}`"
-          @click="openPage(param_course, param_user_course, 'lesson', lessons.id)"
+          v-for="(lessons, lessonId) in modules.lessons"
+          :key="`lessons-${lessonId}`"
+          :class="{
+            'state-completed': lessons.completed,
+            'state-current': detectPage(false, param_course, param_user_course, moduleId, 'lessons', lessonId)
+          }"
+          @click="detectPage(true, param_course, param_user_course, moduleId, 'lessons', lessonId)"
         >
-          L{{ lessons.id }}
+          L{{ lessonId }}
         </div>
         <div
           class="timeline-module_state"
-          v-for="quizzes in modules.quizzes"
-          :key="`quizzes-${quizzes.id}`"
-          @click="openPage(param_course, param_user_course, 'quiz', quizzes.id)"
+          v-for="(quizzes, quizId) in modules.quizzes"
+          :key="`quizzes-${quizId}`"
+          :class="{
+            'state-completed': quizzes.completed,
+            'state-current': detectPage(false, param_course, param_user_course, moduleId, 'quizzes', quizId)
+          }"
+          @click="detectPage(true, param_course, param_user_course, moduleId, 'quizzes', quizId)"
         >
-          Q{{ quizzes.id }}
+          Q{{ quizId }}
         </div>
       </div>
       <div
         class="timeline-end"
-        @click="openPage(param_course, param_user_course, 'finish', 1)"
+        :class="{
+          'state-completed': status.completed,
+          'state-current': detectPage(false, param_course, param_user_course, 1, 'finish', 1)
+        }"
+        @click="detectPage(true, param_course, param_user_course, 1, 'finish', 1)"
       >
         <AwardIcon />
       </div>
     </div>
-    <div class="card card-default mb-3">
-      <div class="card-body">
-        <DetailCourse v-if="param_type == 'course'" :content="course" />
-        <DetailLesson v-if="param_type == 'lesson'" :content="content" />
-        <DetailQuiz v-if="param_type == 'quiz'" :content="content" />
-        <DetailFinish v-if="param_type == 'finish'"/>
-      </div>
-    </div>
-    <div v-if="param_type != 'finish'" class="card card-default">
-      <div class="card-body text-center">
-        <button v-if="param_type != 'course'" class="btn btn-outline-primary">
-          Previous Lesson
-        </button>
-        <button v-if="param_type != 'course'" class="btn btn-outline-primary">
-          Mark as Completed
-        </button>
-        <button class="btn btn-outline-primary">
-          Next Lesson
-        </button>
-      </div>
-    </div>
-    <div v-else class="card card-default">
-      <div class="card-body text-center">
-        <button class="btn btn-outline-primary">
-          Open Certificate
-        </button>
-      </div>
+    <div v-if="!is_loading">
+      <DetailCourse v-if="param_type == 'course'" :content="content" />
+      <DetailLesson v-if="param_type == 'lessons'" :content="content" :status="status.modules[param_module][param_type]" />
+      <DetailQuiz v-if="param_type == 'quizzes'" :content="content" :status="status.modules[param_module][param_type]" />
+      <DetailFinish v-if="param_type == 'finish'" :status="status"/>
     </div>
   </div>
 </template>
@@ -82,13 +75,14 @@ import DetailFinish from "../../components/room/DetailFinish";
 export default {
   data() {
     return {
-      course: {},
       content: {},
       status: {},
-      param_user_course: 0,
       param_course: 0,
+      param_user_course: 0,
+      param_module: 0,
       param_type: 0,
-      param_order: 0
+      param_content: 0,
+      is_loading: true
     };
   },
   components: {
@@ -100,75 +94,109 @@ export default {
     DetailFinish
   },
   mounted() {
+    this.is_loading = true
     this.loadContent()
   },
   watch: {
     '$route' (to, from) {
+      this.is_loading = true
       this.loadContent()
     }
   },
   methods: {
-    loadContent() {
+    async loadContent() {
       const {
-        params: { course, user_course, type, order }
+        params: { course_id, user_course_id, module_id, type, content_id }
       } = this.$route;
 
-      this.param_user_course = user_course;
-      this.param_course = course;
+      this.param_course = course_id;
+      this.param_user_course = user_course_id;
+      this.param_module = module_id;
       this.param_type = type;
-      this.param_order = order;
+      this.param_content = content_id;
 
-      this.loadStatus(user_course, course);
-      this.loadCourse(user_course, course);
+      const resultStatus = await this.loadStatus(user_course_id, course_id);
+
+      if (resultStatus.data) {
+        this.status = resultStatus.data
+      }
 
       switch (type) {
-        case "lesson":
-          this.loadLesson(user_course, order);
+        case "course":
+          const resultCourse = await this.loadCourse(user_course_id, course_id);
+          if (resultCourse.data) {
+            this.content = resultCourse.data
+          }
           break;
-        case "quiz":
-          this.loadQuiz(user_course, order);
+        case "lessons":
+          const resultLesson = await this.loadLesson(user_course_id, content_id);
+          if (resultLesson.data) {
+            this.content = resultLesson.data
+          }
+          break;
+        case "quizzes":
+          const resultQuiz = await this.loadQuiz(user_course_id, content_id);
+          if (resultQuiz.data) {
+            this.content = resultQuiz.data
+          }
           break;
       }
-    },
-    loadCourse(user_course, course) {
-      this.$http({
-        url: `/v1/room/course/${user_course}/${course}`,
-        method: "GET"
-      }).then(({ data }) => {
-        this.course = data.data;
-      });
-    },
-    loadLesson(user_course, order) {
-      this.$http({
-        url: `/v1/room/lesson/${user_course}/${order}`,
-        method: "GET"
-      }).then(({ data }) => {
-        this.content = data;
-      });
-    },
-    loadQuiz(user_course, order) {
-      this.$http({
-        url: `/v1/room/quiz/${user_course}/${order}`,
-        method: "GET"
-      }).then(({ data }) => {
-        this.content = data;
-      });
-    },
-    loadStatus(user_course, course) {
-      this.$http({
-        url: `/v1/room/status/${user_course}/${course}`,
-        method: "GET"
-      }).then(({ data }) => {
-        this.status = data.data;
-      });
-    },
-    openPage(course, user_course, type, order) {
-      const { path } = this.$route
-      const nextPage = `/room/${course}/${user_course}/${type}/${order}`
 
-      if (path !== nextPage) {
-        this.$router.push(nextPage)
+      this.is_loading = false
+    },
+    async loadCourse(user_course_id, course_id) {
+      const { data } = await this.$http({
+        url: `/v1/room/course/${user_course_id}/${course_id}`,
+        method: "GET"
+      });
+
+      return data
+    },
+    async loadLesson(user_course_id, content_id) {
+      const { data } = await this.$http({
+        url: `/v1/room/lesson/${user_course_id}/${content_id}`,
+        method: "GET"
+      });
+
+      return data
+    },
+    async loadQuiz(user_course_id, content_id) {
+      const { data } = await this.$http({
+        url: `/v1/room/quiz/${user_course_id}/${content_id}`,
+        method: "GET"
+      });
+
+      return data
+    },
+    async loadStatus(user_course_id, course_id) {
+      const { data } = await this.$http({
+        url: `/v1/room/${user_course_id}/${course_id}`,
+        method: "GET"
+      });
+
+      return data
+    },
+    createPage(course_id, user_course_id, module_id, type, content_id) {
+      const { path } = this.$route
+      const nextPage = `/room/${course_id}/${user_course_id}/${module_id}/${type}/${content_id}`
+
+      return {
+        current: path,
+        next_page: nextPage
       }
+    },
+    detectPage(forRouter, course_id, user_course_id, module_id, type, content_id = 0) {
+      const { current, next_page } = this.createPage(course_id, user_course_id, module_id, type, content_id)
+
+      if (current !== next_page) {
+        if (forRouter) {
+          this.$router.push(next_page)
+        } else {
+          return false
+        }
+      }
+
+      return true
     }
   }
 };
@@ -196,9 +224,16 @@ export default {
     svg {
       width: 14px;
     }
-    &:hover,
-    &.state-active {
-      background-color: rgba($color: #000000, $alpha: 0.05);
+    &:hover {
+      background-color: rgba($color: #1A1A1A, $alpha: 0.2);
+    }
+    &.state-completed {
+      background-color: #1A1A1A;
+      color: #ffffff;
+    }
+    &.state-current {
+      background-color: rgb(53, 34, 231);
+      color: #ffffff;
     }
   }
 

@@ -28,27 +28,43 @@ class UserCourseController extends Controller
             $courseStatus['id'] = $userCourse->id;
             $courseStatus['course_id'] = $userCourse->course_id;
             $courseStatus['updated_at'] = $userCourse->updated_at;
+            $courseStatus['completed'] = false;
+            $courseStatus['total_lesson'] = 0;
+            $courseStatus['total_quiz'] = 0;
+            $courseStatus['completed_lesson'] = 0;
+            $courseStatus['completed_quiz'] = 0;
 
             $userCourse['course'] = $userCourse->course;
 
-            if ($userCourse['course']) {
+            if (isset($userCourse['course'])) {
                 foreach($userCourse['course']->modules as $modules) {
-                    if ($modules->lessons) {
+                    if (isset($modules->lessons)) {
+                        $courseStatus['total_lesson'] += count($modules->lessons);
+
                         foreach ($modules->lessons as $lessons) {
-                            $courseStatus['modules'][$modules->id]['lessons'][] = [
+                            $courseStatus['modules'][$modules->id]['lessons'][$lessons->id] = [
                                 'id' => $lessons->id,
-                                'completed' => false
+                                'completed' => false,
+                                'last_lesson' => false,
                             ];
                         }
                     }
 
-                    if ($modules->quizzes) {
+                    if (isset($modules->quizzes)) {
+                        $courseStatus['total_quiz'] += count($modules->quizzes);
                         foreach ($modules->quizzes as $quizzes) {
                             $quizzes['questions'] = $quizzes->questions;
+                            
+                            if (isset($quizzes->questions)) {
+                                $courseStatus['modules'][$modules->id]['quizzes'][$quizzes->id]['completed'] = false;
+                                $courseStatus['modules'][$modules->id]['quizzes'][$quizzes->id]['last_quiz'] = false;
+                                $courseStatus['modules'][$modules->id]['quizzes'][$quizzes->id]['total_question'] = count($quizzes->questions);
+                                $courseStatus['modules'][$modules->id]['quizzes'][$quizzes->id]['total_correct'] = 0;
+                                $courseStatus['modules'][$modules->id]['quizzes'][$quizzes->id]['total_wrong'] = 0;
+                                $courseStatus['modules'][$modules->id]['quizzes'][$quizzes->id]['score'] = 0;
+                                $courseStatus['modules'][$modules->id]['quizzes'][$quizzes->id]['score_number'] = 0;
+                                $courseStatus['modules'][$modules->id]['quizzes'][$quizzes->id]['questions'] = [];
 
-                            $courseStatus['modules'][$modules->id]['quizzes'][$quizzes->id] = [];
-
-                            if ($quizzes->questions) {
                                 foreach ($quizzes->questions as $questions) {
                                     $questionAnswer = 0;
                                     
@@ -58,11 +74,9 @@ class UserCourseController extends Controller
                                         }
                                     }
 
-                                    $courseStatus['modules'][$modules->id]['quizzes'][$quizzes->id][] = [
-                                        'id' => $questions->id,
-                                        'completed' => false,
-                                        'correct' => false,
-                                        'valid' => $questionAnswer
+                                    $courseStatus['modules'][$modules->id]['quizzes'][$quizzes->id]['questions'][$questions->id] = [
+                                        'answer' => false,
+                                        'correct_answer' => $questionAnswer
                                     ];
                                 }
                             }
@@ -71,13 +85,10 @@ class UserCourseController extends Controller
                 }
             }
 
-            $userCourseModules = $userCourse->modules;
-            $userCourseQuizzes = $userCourse->quizzes;
-
             $completedLessons = [];
             $completedQuizzes = [];
 
-            foreach ($userCourseModules as $modules) {
+            foreach ($userCourse->modules as $modules) {
                 if ($modules->completed) {
                     array_push($completedLessons, [
                         'lesson' => $modules->module_lesson_id,
@@ -86,48 +97,98 @@ class UserCourseController extends Controller
                 }
             }
 
-            foreach ($userCourseQuizzes as $quizzes) {
+            foreach ($userCourse->quizzes as $quizzes) {
                 if ($quizzes->module_quiz_choice_id) {
                     array_push($completedQuizzes, [
                         'question' => $quizzes->module_quiz_question_id,
-                        'choice' => $quizzes->module_quiz_choice_id,
+                        'answer' => $quizzes->module_quiz_choice_id,
                         'updated_at' => $quizzes->updated_at,
                     ]);
                 }
             }
 
+            $countLastLesson = 0;
+            $countLastQuiz = 0;
             foreach ($courseStatus['modules'] as $moduleId => $modules) {
-                foreach ($modules['lessons'] as $lessonIndex => $lesson) {
-                    foreach($completedLessons as $completedLesson) {
-                        if ($lesson['id'] == $completedLesson['lesson']) {
-                            $courseStatus['modules'][$moduleId]['lessons'][$lessonIndex]['completed'] = true;
-                            $courseStatus['modules'][$moduleId]['lessons'][$lessonIndex]['updated_at'] = $completedLesson['updated_at'];
-                        }
-                    }
-                }
-                
-                foreach ($modules['quizzes'] as $quizzesIndex => $quizzes) {
-                    foreach($quizzes as $questionIndex => $question) {
-                        foreach($completedQuizzes as $completedQuiz) {
-                            if ($question['id'] == $completedQuiz['question']) {
-                                $courseStatus['modules'][$moduleId]['quizzes'][$quizzesIndex][$questionIndex]['completed'] = true;
-    
-                                if ($question['valid'] === $completedQuiz['choice']) {
-                                    $courseStatus['modules'][$moduleId]['quizzes'][$quizzesIndex][$questionIndex]['correct'] = true;
-                                    $courseStatus['modules'][$moduleId]['quizzes'][$quizzesIndex][$questionIndex]['updated_at'] = $completedQuiz['updated_at'];
-                                    unset($courseStatus['modules'][$moduleId]['quizzes'][$quizzesIndex][$questionIndex]['valid']);
-                                }
+                if (isset($modules['lessons'])) {
+                    foreach ($modules['lessons'] as $lessonIndex => $lesson) {
+                        $countLastLesson++;
+
+                        foreach($completedLessons as $completedLesson) {
+                            if ($lesson['id'] == $completedLesson['lesson']) {
+                                $courseStatus['completed_lesson'] += 1;
+                                $courseStatus['modules'][$moduleId]['lessons'][$lesson['id']]['completed'] = true;
+                                $courseStatus['modules'][$moduleId]['lessons'][$lesson['id']]['updated_at'] = $completedLesson['updated_at'];
                             }
                         }
+                        if ($courseStatus['total_lesson'] === $countLastLesson) {
+                            $courseStatus['modules'][$moduleId]['lessons'][$lesson['id']]['last_lesson'] = true;
+                        }
                     }
+                } else {
+                    $courseStatus['modules'][$moduleId]['lessons'] = [];
+                }
+                
+                if (isset($modules['quizzes'])) {                    
+                    foreach ($modules['quizzes'] as $quizId => $quiz) {
+                        $countCompleted = 0;
+                        $countLastQuiz++;
+
+                        foreach ($quiz['questions'] as $questionId => $question) {
+                            foreach($completedQuizzes as $completedQuiz) {
+                                if ($questionId == $completedQuiz['question']) {
+                                    $countCompleted++;
+
+                                    $courseStatus['modules'][$moduleId]['quizzes'][$quizId]['questions'][$questionId]['answer'] = true;
+                                    $courseStatus['modules'][$moduleId]['quizzes'][$quizId]['questions'][$questionId]['answer_choice'] = $completedQuiz['answer'];
+                                    $courseStatus['modules'][$moduleId]['quizzes'][$quizId]['questions'][$questionId]['updated_at'] = $completedQuiz['updated_at'];
+
+                                    if ($question['correct_answer'] === $completedQuiz['answer']) {
+                                        $courseStatus['modules'][$moduleId]['quizzes'][$quizId]['total_correct'] += 1;
+                                        $courseStatus['modules'][$moduleId]['quizzes'][$quizId]['questions'][$questionId]['correct'] = true;
+                                    } else {
+                                        $courseStatus['modules'][$moduleId]['quizzes'][$quizId]['total_wrong'] += 1;
+                                    }
+                                }
+                            }
+
+                            if ($countCompleted === $quiz['total_question']) {
+                                $correctScore = $courseStatus['modules'][$moduleId]['quizzes'][$quizId]['total_correct'] / $courseStatus['modules'][$moduleId]['quizzes'][$quizId]['total_question'];
+
+                                $courseStatus['completed_quiz'] += 1;
+                                $courseStatus['modules'][$moduleId]['quizzes'][$quizId]['completed'] = true;
+                                $courseStatus['modules'][$moduleId]['quizzes'][$quizId]['score'] = round($correctScore, 2);
+                                $courseStatus['modules'][$moduleId]['quizzes'][$quizId]['score_number'] = round($correctScore * 100, 2);
+                            }
+
+                            if ($courseStatus['total_quiz'] === $countLastQuiz) {
+                                $courseStatus['modules'][$moduleId]['quizzes'][$quizId]['last_quiz'] = true;
+                            }
+
+                            unset($courseStatus['modules'][$moduleId]['quizzes'][$quizId]['questions'][$questionId]['correct_answer']);
+                        }
+                    }
+                } else {
+                    $courseStatus['modules'][$moduleId]['quizzes'] = [];
                 }
             }
 
-            return response()->json($courseStatus, 200);
+            if (
+                ($courseStatus['total_lesson'] === $courseStatus['completed_lesson']) &&
+                ($courseStatus['total_quiz'] === $courseStatus['completed_quiz'])
+            ) {
+                $courseStatus['completed'] = true;
+            }
+
+            return response()->json([
+                'error'   => false,
+                'message' => 'Successfully reading a class room',
+                'data'    => $courseStatus
+            ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'error'   => true,
-                'message' => 'Something went wrong when reading a module quiz',
+                'message' => 'Something went wrong when reading a class room',
                 'data'    => []
             ], 500);
         }

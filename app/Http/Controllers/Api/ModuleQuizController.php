@@ -20,7 +20,11 @@ class ModuleQuizController extends Controller
                 $question['choices'] = $question->choices;
             }
     
-            return response()->json($moduleQuiz, 200);
+            return response()->json([
+                'error'   => false,
+                'message' => 'Successfully reading a quiz of class',
+                'data'    => $moduleQuiz
+            ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'error'   => true,

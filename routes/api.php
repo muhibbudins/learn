@@ -66,10 +66,10 @@ Route::prefix('v1')->group(function () {
         |--------------------------------------------------------------------------
         */
         Route::prefix('room')->group(function () {
+            Route::get('{user_course}/{course}', 'Api\UserCourseController@room');
             Route::get('course/{user_course}/{course}', 'Api\CourseController@room');
             route::get('lesson/{user_course}/{lesson}', 'Api\ModuleLessonController@room');
             Route::get('quiz/{user_course}/{quiz}', 'Api\ModuleQuizController@room');
-            Route::get('status/{user_course}/{course}', 'Api\UserCourseController@room');
             Route::post('save/module', 'Api\UserCourseModuleController@saveState');
             Route::post('save/question', 'Api\UserCourseQuizController@saveState');
         });
