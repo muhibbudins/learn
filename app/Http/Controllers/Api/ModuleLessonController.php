@@ -22,11 +22,13 @@ class ModuleLessonController extends Controller
             }
     
             else if ($trashed) {
-                $moduleLessons = ModuleLesson::onlyTrashed()->paginate(30);
+                $moduleLessons = ModuleLesson::onlyTrashed()->paginate(10);
+                $moduleLessons->withPath('/master/module/lesson');
             }
     
             else {
-                $moduleLessons = ModuleLesson::paginate(30);
+                $moduleLessons = ModuleLesson::paginate(10);
+                $moduleLessons->withPath('/master/module/lesson');
             }
     
             return response()->json([
@@ -54,11 +56,13 @@ class ModuleLessonController extends Controller
             }
     
             else if ($trashed) {
-                $moduleLessons = ModuleLesson::onlyTrashed()->paginate(30);
+                $moduleLessons = ModuleLesson::onlyTrashed()->paginate(10);
+                $moduleLessons->withPath('/master/module/lesson');
             }
     
             else {
-                $moduleLessons = ModuleLesson::paginate(30);
+                $moduleLessons = ModuleLesson::paginate(10);
+                $moduleLessons->withPath('/master/module/lesson');
             }
     
             return response()->json($moduleLessons, 200);
@@ -73,7 +77,7 @@ class ModuleLessonController extends Controller
 
     public function create(Request $request) {
         $validator = Validator::make($request->all(), [
-            'module_id' => 'required|string',
+            'module_id' => 'required|integer',
             'title' => 'required|string',
             'description' => 'required|string',
             'content' => 'required|string',
@@ -113,7 +117,7 @@ class ModuleLessonController extends Controller
     
     public function update(Request $request, $entity) {
         $validator = Validator::make($request->all(), [
-            'module_id' => 'string',
+            'module_id' => 'integer',
             'title' => 'string',
             'description' => 'string',
             'content' => 'string',

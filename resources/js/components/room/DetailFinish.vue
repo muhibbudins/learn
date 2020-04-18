@@ -5,7 +5,12 @@
         Detail Finish
       </div>
       <div v-else class="text-center">
-        <em><b>You need to complete all lessons & quizzes to view the certificate</b></em>
+        <em
+          ><b
+            >You need to complete all lessons & quizzes to view the
+            certificate</b
+          ></em
+        >
       </div>
     </div>
   </div>

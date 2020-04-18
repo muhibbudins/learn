@@ -6,7 +6,11 @@
       <div class="text-muted mb-3">{{ userCourse.course.created_at }}</div>
       <button
         class="btn btn-primary btn-block"
-        @click="$router.push(`/room/${userCourse.course_id}/${userCourse.course.id}/0/course/0`)"
+        @click="
+          $router.push(
+            `/room/${userCourse.course_id}/${userCourse.course.id}/0/course/0`
+          )
+        "
       >
         Open Class
       </button>
@@ -22,7 +26,7 @@ export default {
       default: () => {}
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

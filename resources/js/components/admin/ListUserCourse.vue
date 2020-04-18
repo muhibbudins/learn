@@ -1,53 +1,63 @@
 <template>
   <div>
-    <div>List of User Course</div>
-    <div class="alert alert-danger" v-if="has_error">
-      <p>An error on server</p>
+    <div class="alert alert-danger" v-if="errorMessage">
+      {{ errorMessage }}
     </div>
-    <table class="table">
-      <tr>
-        <th scope="col">Id</th>
-        <th scope="col">Course</th>
-        <th scope="col">Description</th>
-        <th scope="col">Action</th>
-      </tr>
-      <tr
-        v-for="data in courses"
-        v-bind:key="data.id"
-        style="margin-bottom: 5px;"
-      >
-        <th scope="row">{{ data.id }}</th>
-        <td>{{ data.course.title }}</td>
-        <td>{{ data.course.description }}</td>
-        <td>
-          <a href="#" class="btn btn-sm btn-primary">Learn</a>
-        </td>
-      </tr>
-    </table>
+    <b-pagination
+      v-model="usercourses.current_page"
+      :total-rows="usercourses.total"
+      :per-page="usercourses.per_page"
+      aria-controls="my-table"
+      @change="getUserCourses($event)"
+    />
+    <b-table hover :items="usercourses.data" :fields="fields" />
   </div>
 </template>
+
 <script>
 export default {
   data() {
     return {
-      has_error: false,
-      courses: null
+      errorMessage: false,
+      fields: [
+        {
+          key: "id",
+          label: "ID"
+        },
+        {
+          key: "user.name",
+          label: "Username"
+        },
+        {
+          key: "user.email",
+          label: "E-mail"
+        },
+        {
+          key: "course.title",
+          label: "Course Title"
+        },
+        {
+          key: "created_at",
+          label: "Join Date"
+        }
+      ],
+      usercourses: {}
     };
   },
   mounted() {
-    this.getCourseUsers();
+    this.getUserCourses();
   },
   methods: {
-    getCourseUsers() {
+    getUserCourses(page) {
       this.$http({
-        url: `/v1/user/course`,
+        url: `/v1/master/user/course?page=${page || 1}`,
         method: "GET"
       }).then(
-        res => {
-          this.courses = res.data;
+        ({ data }) => {
+          this.usercourses = data;
         },
-        () => {
-          this.has_error = true;
+        ({ message }) => {
+          this.errorMessage = message;
         }
       );
     }

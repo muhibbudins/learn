@@ -78,10 +78,6 @@ export default {
             path: "dashboard-user"
           },
           {
-            name: "Profile",
-            path: "dashboard-profile"
-          },
-          {
             name: "Logout",
             logout: true
           }

@@ -26,10 +26,12 @@ class ModuleQuizQuestionController extends Controller
                 }
             }
             else if ($trashed) {
-                $moduleQuizQuestion = ModuleQuizQuestion::onlyTrashed()->paginate(30);
+                $moduleQuizQuestion = ModuleQuizQuestion::onlyTrashed()->paginate(10);
+                $moduleQuizQuestion->withPath('/master/module/quiz/question');
             }
             else {
-                $moduleQuizQuestion = ModuleQuizQuestion::paginate(30);
+                $moduleQuizQuestion = ModuleQuizQuestion::paginate(10);
+                $moduleQuizQuestion->withPath('/master/module/quiz/question');
             }
     
             return response()->json($moduleQuizQuestion, 200);
@@ -44,9 +46,8 @@ class ModuleQuizQuestionController extends Controller
 
     public function create(Request $request) {
         $validator = Validator::make($request->all(), [
-            'module_quiz_id' => 'required|string',
+            'module_quiz_id' => 'required|integer',
             'title' => 'required|string',
-            'description' => 'string',
             'status' => 'integer',
         ]);
 
@@ -82,9 +83,8 @@ class ModuleQuizQuestionController extends Controller
     
     public function update(Request $request, $entity) {
         $validator = Validator::make($request->all(), [
-            'module_quiz_id' => 'string',
+            'module_quiz_id' => 'integer',
             'title' => 'string',
-            'description' => 'string',
             'status' => 'integer',
         ]);
 

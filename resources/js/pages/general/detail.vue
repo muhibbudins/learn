@@ -12,8 +12,14 @@
             <h6 class="text-muted">About</h6>
             <h4>{{ course.title }}</h4>
             <p>{{ course.created_at }}</p>
-            <div v-if="course.content" v-html="compileToHTML(course.content)"></div>
-            <button class="btn btn-primary" @click="$router.push({ name: $auth.check() ? '' : 'login' })">
+            <div
+              v-if="course.content"
+              v-html="compileToHTML(course.content)"
+            ></div>
+            <button
+              class="btn btn-primary"
+              @click="$router.push({ name: $auth.check() ? '' : 'login' })"
+            >
               Join Course
             </button>
           </div>
@@ -55,7 +61,7 @@
 </template>
 
 <script>
-import markdown from 'marked';
+import markdown from "marked";
 
 export default {
   data() {
@@ -72,14 +78,12 @@ export default {
       this.$http({
         url: `/v1/general/course/detail/${id}`,
         method: "GET"
-      }).then(
-        ({ data }) => {
-          this.course = data.data;
-        }
-      );
+      }).then(({ data }) => {
+        this.course = data.data;
+      });
     },
     compileToHTML(text) {
-      return markdown(text, { sanitize: true })
+      return markdown(text, { sanitize: true });
     }
   }
 };

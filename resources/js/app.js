@@ -5,7 +5,7 @@
  */
 
 import "es6-promise/auto"
-import "./bootstrap"
+import "../css/lux.min.css"
 
 import axios from "axios"
 import Vue from "vue"
@@ -16,6 +16,12 @@ import VueApexCharts from 'vue-apexcharts'
 import Index from "./Index"
 import auth from "./auth"
 import router from "./router"
+import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
+
+// Install BootstrapVue
+Vue.use(BootstrapVue)
+// Optionally install the BootstrapVue icon components plugin
+Vue.use(IconsPlugin)
 
 // Set Vue globally
 window.Vue = Vue;

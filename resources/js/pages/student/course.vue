@@ -33,11 +33,9 @@ export default {
       this.$http({
         url: `/v1/account/course`,
         method: "GET"
-      }).then(
-        ({ data }) => {
-          this.courses = data.data;
-        }
-      );
+      }).then(({ data }) => {
+        this.courses = data.data;
+      });
     }
   }
 };

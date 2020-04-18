@@ -4,19 +4,19 @@
       <div class="card-body">
         <h4>{{ content.title }}</h4>
         <p>{{ content.description }}</p>
-        <div v-if="content.content" v-html="compileToHTML(content.content)"></div>
+        <div
+          v-if="content.content"
+          v-html="compileToHTML(content.content)"
+        ></div>
       </div>
     </div>
     <div class="card card-default">
       <div class="card-body text-center">
-        <!-- <button class="btn btn-outline-primary">
-          Previous Lesson
-        </button> -->
         <button
           :class="{
             btn: true,
             'btn-primary': lessonData.completed,
-            'btn-outline-primary': !lessonData.completed,
+            'btn-outline-primary': !lessonData.completed
           }"
           @click="changeState"
         >
@@ -27,19 +27,13 @@
             Mark as Completed
           </span>
         </button>
-        <!-- <button v-if="!lessonData.last_lesson" class="btn btn-outline-primary">
-          Next Lesson
-        </button>
-        <button v-else class="btn btn-outline-primary">
-          See Certificate
-        </button> -->
       </div>
     </div>
   </section>
 </template>
 
 <script>
-import markdown from 'marked';
+import markdown from "marked";
 
 export default {
   props: {
@@ -55,18 +49,20 @@ export default {
   data() {
     return {
       lessonData: {}
-    }
+    };
   },
   mounted() {
-    this.lessonData = this.status[this.content.id]
+    this.lessonData = this.status[this.content.id];
   },
   methods: {
     compileToHTML(text) {
-      return markdown(text, { sanitize: true })
+      return markdown(text, { sanitize: true });
     },
     async changeState() {
-      const { params: { user_course_id, content_id } } = this.$route
-      const isCompleted = this.lessonData.completed ? 0 : 1
+      const {
+        params: { user_course_id, content_id }
+      } = this.$route;
+      const isCompleted = this.lessonData.completed ? 0 : 1;
 
       const { data } = await this.$http({
         url: `/v1/room/save/module`,
@@ -78,9 +74,7 @@ export default {
         }
       });
 
-      this.lessonData.completed = isCompleted
-
-      // do something with data here
+      this.lessonData.completed = isCompleted;
     }
   }
 };

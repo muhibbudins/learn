@@ -3,25 +3,35 @@
     <div class="col-12 mb-3">
       <div class="card card-default">
         <div class="card-body">
-          <h6 class="card-title text-muted text-center">User Count</h6>
+          <h6 class="card-title text-muted text-center">Student Register Report</h6>
           <div class="toolbar">
-            <button :class="getActiveClass('one_month')" @click="updateData('one_month')">
+            <button
+              :class="getActiveClass('one_month')"
+              @click="updateData('one_month')"
+            >
               1 Month
             </button>
-            <button :class="getActiveClass('six_months')" @click="updateData('six_months')">
+            <button
+              :class="getActiveClass('six_months')"
+              @click="updateData('six_months')"
+            >
               6 Months
             </button>
-            <button :class="getActiveClass('one_year')" @click="updateData('one_year')">
+            <button
+              :class="getActiveClass('one_year')"
+              @click="updateData('one_year')"
+            >
               1 Year
             </button>
           </div>
           <apexchart
+            v-if="series.length > 0"
             type="area"
             height="350"
             ref="chart"
             :options="chartOptions"
             :series="series"
-          ></apexchart>
+          />
         </div>
       </div>
     </div>
@@ -61,10 +71,15 @@
 <script>
 import CountTo from "vue-count-to";
 
-let current = new Date();
-
 export default {
   data() {
+    const current = new Date();
+    let minimumDate = null;
+
+    if (!minimumDate) {
+      minimumDate = current.setMonth(current.getMonth() - 1)
+    }
+
     return {
       reportCourseTotal: 0,
       reportCourseFollower: {},
@@ -90,7 +105,7 @@ export default {
         },
         xaxis: {
           type: "datetime",
-          min: current.setMonth(current.getMonth() - 1),
+          min: minimumDate,
           tickAmount: 6
         },
         tooltip: {
@@ -143,6 +158,7 @@ export default {
         method: "GET"
       }).then(({ data }) => {
         this.series = data.data;
+        this.updateData("one_month");
       });
     },
     getActiveClass(timeline) {
@@ -151,25 +167,29 @@ export default {
         : "btn btn-sm btn-secondary";
     },
     updateData: function(timeline) {
-      current = new Date();
+      if (!this.$refs.chart) {
+        return false
+      }
+
+      const currentDate = new Date();
       this.selection = timeline;
 
       switch (timeline) {
         case "one_month":
           this.$refs.chart.zoomX(
-            current.setMonth(current.getMonth() - 1),
+            currentDate.setMonth(currentDate.getMonth() - 1),
             new Date().getTime()
           );
           break;
         case "six_months":
           this.$refs.chart.zoomX(
-            current.setMonth(current.getMonth() - 6),
+            currentDate.setMonth(currentDate.getMonth() - 6),
             new Date().getTime()
           );
           break;
         case "one_year":
           this.$refs.chart.zoomX(
-            current.setFullYear(current.getFullYear() - 1),
+            currentDate.setFullYear(currentDate.getFullYear() - 1),
             new Date().getTime()
           );
           break;

@@ -48,14 +48,13 @@
 export default {
   data() {
     return {
-      email: 'admin@e-learning.com',
-      password: 'admin',
+      email: "admin@e-learning.com",
+      password: "admin",
       has_error: false
     };
   },
   methods: {
     login() {
-      // get the redirect object
       var app = this;
       this.$auth
         .login({

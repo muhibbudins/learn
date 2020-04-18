@@ -45,14 +45,22 @@ class ModuleQuizController extends Controller
                 $moduleQuiz['questions'] = $moduleQuiz->questions;
 
                 foreach ($moduleQuiz['questions'] as $question) {
-                    $question['choices'] = $question->choices;
+                    $questionAnswer = 0;
+                    foreach ($question->choices as $choice) {
+                        if ($choice->answer) {
+                            $questionAnswer = $choice->id;
+                        }
+                    }
+                    $question['answer'] = $questionAnswer;
                 }
             }
             else if ($trashed) {
-                $moduleQuiz = ModuleQuiz::onlyTrashed()->paginate(30);
+                $moduleQuiz = ModuleQuiz::onlyTrashed()->paginate(10);
+                $moduleQuiz->withPath('/master/module/quiz');
             }
             else {
-                $moduleQuiz = ModuleQuiz::paginate(30);
+                $moduleQuiz = ModuleQuiz::paginate(10);
+                $moduleQuiz->withPath('/master/module/quiz');
             }
     
             return response()->json($moduleQuiz, 200);
@@ -67,7 +75,7 @@ class ModuleQuizController extends Controller
 
     public function create(Request $request) {
         $validator = Validator::make($request->all(), [
-            'module_id' => 'required|string',
+            'module_id' => 'required|integer',
             'title' => 'required|string',
             'description' => 'string',
             'status' => 'integer',
@@ -105,7 +113,7 @@ class ModuleQuizController extends Controller
     
     public function update(Request $request, $entity) {
         $validator = Validator::make($request->all(), [
-            'module_id' => 'string',
+            'module_id' => 'integer',
             'title' => 'string',
             'description' => 'string',
             'status' => 'integer',

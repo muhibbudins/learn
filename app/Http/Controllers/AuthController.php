@@ -115,24 +115,33 @@ class AuthController extends Controller
      */
     public function refresh()
     {
-        if ($token = $this->guard()->refresh()) {
-            return response()
-                ->json([
-                    'error'   => false,
-                    'message' => 'Your token already refreshed',
-                    'data'    => [
-                        'token'   => $token
-                    ]
-                ], 200)
-                ->header('Authorization', $token)
-            ;
-        }
+        try {
+            if ($token = $this->guard()->refresh()) {
+                return response()
+                    ->json([
+                        'error'   => false,
+                        'message' => 'Your token already refreshed',
+                        'data'    => [
+                            'token'   => $token
+                        ]
+                    ], 200)
+                    ->header('Authorization', $token)
+                ;
+            }
+    
+            return response()->json([
+                'error'   => true,
+                'message' => 'Your credentials is invalid, failed to refresh token',
+                'data'    => []
+            ], 401);
+        } catch (\Throwable $th) {
+            $this->guard()->logout();
 
-        return response()->json([
-            'error'   => true,
-            'message' => 'Your credentials is invalid, failed to refresh token',
-            'data'    => []
-        ], 401);
+            return response()->json([
+                'error' => false,
+                'message' => 'Successfully logging out from system'
+            ], 200);
+        }
     }
 
     /**

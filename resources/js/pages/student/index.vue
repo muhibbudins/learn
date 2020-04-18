@@ -10,18 +10,13 @@
 <script>
 export default {
   mounted() {
-    //
-  },
-  components: {
-  },
-  mounted() {
     this.$auth.load().then(() => {
-      const { role } = this.$auth.check() && this.$auth.user()
+      const { role } = this.$auth.check() && this.$auth.user();
 
       if (role === "admin") {
         this.$router.push({ name: "dashboard" });
       }
-    })
+    });
   }
 };
 </script>

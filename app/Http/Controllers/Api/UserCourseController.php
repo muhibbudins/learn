@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Pagination\LengthAwarePaginator as Paginator;
 
 class UserCourseController extends Controller
 {
@@ -300,11 +301,27 @@ class UserCourseController extends Controller
                         'data'    => $userCourses
                     ];
                 }
-                else if ($trashed) {
-                    $userCourses = UserCourse::onlyTrashed()->paginate(30);
-                }
                 else {
-                    $userCourses = UserCourse::paginate(30);
+                    $limit = 10;
+                    $current_page = ($request->input("page") ?? 1) - 1;
+
+                    if ($trashed) {
+                        $total = UserCourse::onlyTrashed()->count();
+                        $courseData = UserCourse::onlyTrashed()->skip($current_page)->take($limit)->get();
+                    } else {
+                        $total = UserCourse::count();
+                        $courseData = UserCourse::skip($current_page)->take($limit)->get();
+                    }
+
+                    foreach ($courseData as $course) {
+                        $course->course;
+                        $course->user;
+                    }
+                    $userCourses = new Paginator($courseData, $total, $limit, $current_page, [
+                        'path' => $request->url(),
+                        'query' => $request->query(),
+                    ]);
+                    $userCourses->withPath('/master/user/course');
                 }
             }
     
@@ -369,7 +386,7 @@ class UserCourseController extends Controller
     
     public function update(Request $request, $entity) {
         $validator = Validator::make($request->all(), [
-            'course_id' => 'string',
+            'course_id' => 'integer',
             'user_id' => 'string',
         ]);
 

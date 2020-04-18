@@ -13,7 +13,7 @@
           <div class="col-2">Email</div>
           <div class="col-10">: {{ profile.email }}</div>
           <div class="col-2">Address</div>
-          <div class="col-10">: {{ profile.address || '-'}}</div>
+          <div class="col-10">: {{ profile.address || "-" }}</div>
         </div>
       </div>
     </div>
@@ -27,15 +27,10 @@ export default {
       profile: {}
     };
   },
-  components: {
-    //
-  },
   mounted() {
     this.$auth.load().then(() => {
-      this.profile = this.$auth.user()
-    })
-  },
-  methods: {
+      this.profile = this.$auth.user();
+    });
   }
 };
 </script>

@@ -22,11 +22,13 @@ class ModuleController extends Controller
             }
     
             else if ($trashed) {
-                $module = Module::onlyTrashed()->paginate(30);
+                $module = Module::onlyTrashed()->paginate(10);
+                $module->withPath('/master/module');
             }
     
             else {
-                $module = Module::paginate(30);
+                $module = Module::paginate(10);
+                $module->withPath('/master/module');
             }
     
             return response()->json($module, 200);
@@ -41,7 +43,7 @@ class ModuleController extends Controller
 
     public function create(Request $request) {
         $validator = Validator::make($request->all(), [
-            'course_id' => 'string',
+            'course_id' => 'integer',
             'title' => 'required|string',
             'description' => 'required|string',
             'status' => 'integer',
@@ -79,7 +81,7 @@ class ModuleController extends Controller
     
     public function update(Request $request, $entity) {
         $validator = Validator::make($request->all(), [
-            'course_id' => 'string',
+            'course_id' => 'integer',
             'title' => 'string',
             'description' => 'string',
             'status' => 'integer',

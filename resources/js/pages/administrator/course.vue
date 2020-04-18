@@ -2,36 +2,78 @@
   <div class="container">
     <div class="card card-default mb-3">
       <div class="card-body">
-        <div>Courses</div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-4">
-        <div class="card card-default">
-          <div class="card-body">
-            <Sidebar />
+        <div class="row align-items-center">
+          <div class="col-4">
+            <h6 class="mb-0">
+              Course Lists
+            </h6>
           </div>
-        </div>
-      </div>
-      <div class="col-8">
-        <div class="card card-default">
-          <div class="card-body">
-            <ListCourse />
+          <div class="col-4 ml-auto text-right">
+            <b-button size="sm" variant="success" v-b-modal.modal-create>
+              Create New
+            </b-button>
           </div>
         </div>
       </div>
     </div>
+    <div class="card card-default">
+      <div class="card-body">
+        <ListCourse v-if="isLoaded" />
+      </div>
+    </div>
+    <b-modal id="modal-create" centered title="Create Course" @ok="saveCourse">
+      <div class="form-group">
+        <label for="input_name">Course</label>
+        <input
+          type="text"
+          class="form-control"
+          id="input_name"
+          v-model="course.title"
+          aria-describedby="emailHelp"
+        />
+      </div>
+      <div class="form-group">
+        <label for="input_description">Description</label>
+        <textarea
+          type="description"
+          class="form-control"
+          id="input_description"
+          v-model="course.description"
+          aria-describedby="descriptionHelp"
+          rows="3"
+          cols="6"
+        />
+      </div>
+    </b-modal>
   </div>
 </template>
 <script>
-import Sidebar from "../../components/admin/Sidebar.vue";
 import ListCourse from "../../components/admin/ListCourse.vue";
 export default {
+  data() {
+    return {
+      course: {},
+      isLoaded: false
+    };
+  },
   components: {
-    Sidebar,
     ListCourse
   },
   mounted() {
+    this.isLoaded = true;
+  },
+  methods: {
+    saveCourse() {
+      this.isLoaded = false;
+      this.$http({
+        url: `/v1/master/course`,
+        method: "POST",
+        data: this.course
+      }).then(({ data }) => {
+        this.isLoaded = true;
+        this.course = {};
+      });
+    }
   }
 };
 </script>

@@ -22,11 +22,13 @@ class ModuleQuizChoiceController extends Controller
             }
     
             else if ($trashed) {
-                $moduleQuizChoices = ModuleQuizChoices::onlyTrashed()->paginate(30);
+                $moduleQuizChoices = ModuleQuizChoices::onlyTrashed()->paginate(10);
+                $moduleQuizChoices->withPath('/master/module/quiz/choices');
             }
     
             else {
-                $moduleQuizChoices = ModuleQuizChoices::paginate(30);
+                $moduleQuizChoices = ModuleQuizChoices::paginate(10);
+                $moduleQuizChoices->withPath('/master/module/quiz/choices');
             }
     
             return response()->json($moduleQuizChoices, 200);
@@ -41,10 +43,9 @@ class ModuleQuizChoiceController extends Controller
 
     public function create(Request $request) {
         $validator = Validator::make($request->all(), [
-            'module_quiz_question_id' => 'required|string',
+            'module_quiz_question_id' => 'required|integer',
             'title' => 'string',
-            'description' => 'string',
-            'answer' => 'required|string',
+            'answer' => 'required|integer',
         ]);
 
         if($validator->fails()){
@@ -79,9 +80,8 @@ class ModuleQuizChoiceController extends Controller
     
     public function update(Request $request, $entity) {
         $validator = Validator::make($request->all(), [
-            'module_quiz_question_id' => 'string',
+            'module_quiz_question_id' => 'integer',
             'title' => 'string',
-            'description' => 'string',
             'answer' => 'string',
         ]);
 

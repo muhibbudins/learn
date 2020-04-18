@@ -24,7 +24,7 @@ class UserCourse extends Model
    */
   public function course()
   {
-      return $this->belongsTo('App\Course');
+      return $this->belongsTo('App\Course')->select('id', 'title', 'status', 'created_at');
   }
 
   /**
@@ -32,7 +32,7 @@ class UserCourse extends Model
    */
   public function user()
   {
-      return $this->belongsTo('App\User');
+      return $this->belongsTo('App\User')->select('id', 'name', 'email', 'role');
   }
 
   /**

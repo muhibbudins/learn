@@ -117,7 +117,10 @@ class UserController extends Controller
             $allReport = [];
             $allReportTemp = [];
             $allReportRoles = [];
-            $allUsers = User::where('created_at', '>', 'DATE_SUB(NOW(), INTERVAL 1 YEAR)')->selectRaw('DATE(created_at) as date, role')->get();
+            $allUsers = User::where([
+                ['created_at', '>', 'DATE_SUB(NOW(), INTERVAL 1 YEAR)'],
+                ['role', '=', 'student']
+            ])->selectRaw('DATE(created_at) as date, role')->get();
 
             foreach ($allUsers as $user) {
                 $timestamp = strtotime($user->date);
@@ -185,11 +188,13 @@ class UserController extends Controller
             }
     
             else if ($trashed) {
-                $users = User::onlyTrashed()->paginate(30);
+                $users = User::onlyTrashed()->paginate(10);
+                $users->withPath('/master/user');
             }
     
             else {
-                $users = User::paginate(30);
+                $users = User::paginate(10);
+                $users->withPath('/master/user');
             }
     
             return response()->json($users, 200);
@@ -245,12 +250,9 @@ class UserController extends Controller
     public function update(Request $request, $entity) {
         $validator = Validator::make($request->all(), [
             'name' => 'string',
-            'email' => 'email|unique:users',
+            'email' => 'email',
             'password' => 'min:3|confirmed',
             'role' => 'string',
-            'firstname' => 'string',
-            'lastname' => 'string',
-            'address' => 'string',
             'status' => 'integer',
         ]);
 

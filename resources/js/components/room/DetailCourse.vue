@@ -7,7 +7,10 @@
             <h6 class="text-muted">About</h6>
             <h4>{{ content.title }}</h4>
             <p>{{ content.created_at }}</p>
-            <div v-if="content.content" v-html="compileToHTML(content.content)"></div>
+            <div
+              v-if="content.content"
+              v-html="compileToHTML(content.content)"
+            ></div>
           </div>
           <div class="col-5">
             <h6 class="text-muted">Table Of Contents:</h6>
@@ -54,7 +57,7 @@
 </template>
 
 <script>
-import markdown from 'marked';
+import markdown from "marked";
 
 export default {
   props: {
@@ -65,7 +68,7 @@ export default {
   },
   methods: {
     compileToHTML(text) {
-      return markdown(text, { sanitize: true })
+      return markdown(text, { sanitize: true });
     }
   }
 };

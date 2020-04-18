@@ -1,51 +1,52 @@
 <template>
   <div>
-    <div>List of User</div>
-    <div class="alert alert-danger" v-if="has_error">
-      <p>An error on server</p>
+    <div class="alert alert-danger" v-if="errorMessage">
+      {{ errorMessage }}
     </div>
-    <table class="table">
-      <tr>
-        <th scope="col">Id</th>
-        <th scope="col">Nom</th>
-        <th scope="col">Email</th>
-        <th scope="col">Date d'inscription</th>
-      </tr>
-      <tr
-        v-for="user in users"
-        v-bind:key="user.id"
-        style="margin-bottom: 5px;"
-      >
-        <th scope="row">{{ user.id }}</th>
-        <td>{{ user.name }}</td>
-        <td>{{ user.email }}</td>
-        <td>{{ user.created_at }}</td>
-      </tr>
-    </table>
+    <b-pagination
+      v-model="users.current_page"
+      :total-rows="users.total"
+      :per-page="users.per_page"
+      aria-controls="my-table"
+      @change="getUsers($event)"
+    />
+    <b-table hover :items="users.data" :fields="fields">
+      <template v-slot:cell(actions)="{ item }">
+        <b-button
+          size="sm"
+          variant="outline-primary"
+          @click="$router.push(`/dashboard/user/editor/${item.id}`)"
+        >
+          Update
+        </b-button>
+      </template>
+    </b-table>
   </div>
 </template>
+
 <script>
 export default {
   data() {
     return {
-      has_error: false,
-      users: null
+      errorMessage: false,
+      fields: ["id", "name", "email", "role", "actions"],
+      users: {}
     };
   },
   mounted() {
     this.getUsers();
   },
   methods: {
-    getUsers() {
+    getUsers(page) {
       this.$http({
-        url: `/v1/user`,
+        url: `/v1/master/user?page=${page || 1}`,
         method: "GET"
       }).then(
-        res => {
-          this.users = res.data.users;
+        ({ data }) => {
+          this.users = data;
         },
-        () => {
-          this.has_error = true;
+        ({ message }) => {
+          this.errorMessage = message;
         }
       );
     }

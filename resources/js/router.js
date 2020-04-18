@@ -3,7 +3,9 @@ const VueRouter = require("vue-router").default;
 // Admin Pages
 const Dashboard = require("./pages/administrator/dashboard").default;
 const DashboardUser = require("./pages/administrator/user").default;
+const DashboardUserEditor = require("./pages/administrator/user-editor").default;
 const DashboardCourse = require("./pages/administrator/course").default;
+const DashboardCourseEditor = require("./pages/administrator/course-editor").default;
 const DashboardProfile = require("./pages/administrator/profile").default;
 const DashboardUserCourse = require("./pages/administrator/user-course").default;
 
@@ -51,6 +53,14 @@ const routes = [
     }
   },
   {
+    path: "/dashboard/courses/editor/:course_id",
+    name: "dashboard-courses-editor",
+    component: DashboardCourseEditor,
+    meta: {
+      ...authAdmin
+    }
+  },
+  {
     path: "/dashboard/profile",
     name: "dashboard-profile",
     component: DashboardProfile,
@@ -62,6 +72,14 @@ const routes = [
     path: "/dashboard/user",
     name: "dashboard-user",
     component: DashboardUser,
+    meta: {
+      ...authAdmin
+    }
+  },
+  {
+    path: "/dashboard/user/editor/:id?",
+    name: "dashboard-user-editor",
+    component: DashboardUserEditor,
     meta: {
       ...authAdmin
     }

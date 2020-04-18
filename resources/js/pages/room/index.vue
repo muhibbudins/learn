@@ -9,9 +9,18 @@
       <div
         class="timeline-start state-completed"
         :class="{
-          'state-current': detectPage(false, param_course, param_user_course, 0, 'course', 0)
+          'state-current': detectPage(
+            false,
+            param_course,
+            param_user_course,
+            0,
+            'course',
+            0
+          )
         }"
-        @click="detectPage(true, param_course, param_user_course, 0, 'course', 0)"
+        @click="
+          detectPage(true, param_course, param_user_course, 0, 'course', 0)
+        "
       >
         <HomeIcon />
       </div>
@@ -26,9 +35,25 @@
           :key="`lessons-${lessonId}`"
           :class="{
             'state-completed': lessons.completed,
-            'state-current': detectPage(false, param_course, param_user_course, moduleId, 'lessons', lessonId)
+            'state-current': detectPage(
+              false,
+              param_course,
+              param_user_course,
+              moduleId,
+              'lessons',
+              lessonId
+            )
           }"
-          @click="detectPage(true, param_course, param_user_course, moduleId, 'lessons', lessonId)"
+          @click="
+            detectPage(
+              true,
+              param_course,
+              param_user_course,
+              moduleId,
+              'lessons',
+              lessonId
+            )
+          "
         >
           L{{ lessonId }}
         </div>
@@ -38,9 +63,25 @@
           :key="`quizzes-${quizId}`"
           :class="{
             'state-completed': quizzes.completed,
-            'state-current': detectPage(false, param_course, param_user_course, moduleId, 'quizzes', quizId)
+            'state-current': detectPage(
+              false,
+              param_course,
+              param_user_course,
+              moduleId,
+              'quizzes',
+              quizId
+            )
           }"
-          @click="detectPage(true, param_course, param_user_course, moduleId, 'quizzes', quizId)"
+          @click="
+            detectPage(
+              true,
+              param_course,
+              param_user_course,
+              moduleId,
+              'quizzes',
+              quizId
+            )
+          "
         >
           Q{{ quizId }}
         </div>
@@ -49,18 +90,35 @@
         class="timeline-end"
         :class="{
           'state-completed': status.completed,
-          'state-current': detectPage(false, param_course, param_user_course, 1, 'finish', 1)
+          'state-current': detectPage(
+            false,
+            param_course,
+            param_user_course,
+            1,
+            'finish',
+            1
+          )
         }"
-        @click="detectPage(true, param_course, param_user_course, 1, 'finish', 1)"
+        @click="
+          detectPage(true, param_course, param_user_course, 1, 'finish', 1)
+        "
       >
         <AwardIcon />
       </div>
     </div>
     <div v-if="!is_loading">
       <DetailCourse v-if="param_type == 'course'" :content="content" />
-      <DetailLesson v-if="param_type == 'lessons'" :content="content" :status="status.modules[param_module][param_type]" />
-      <DetailQuiz v-if="param_type == 'quizzes'" :content="content" :status="status.modules[param_module][param_type]" />
-      <DetailFinish v-if="param_type == 'finish'" :status="status"/>
+      <DetailLesson
+        v-if="param_type == 'lessons'"
+        :content="content"
+        :status="status.modules[param_module][param_type]"
+      />
+      <DetailQuiz
+        v-if="param_type == 'quizzes'"
+        :content="content"
+        :status="status.modules[param_module][param_type]"
+      />
+      <DetailFinish v-if="param_type == 'finish'" :status="status" />
     </div>
   </div>
 </template>
@@ -94,13 +152,13 @@ export default {
     DetailFinish
   },
   mounted() {
-    this.is_loading = true
-    this.loadContent()
+    this.is_loading = true;
+    this.loadContent();
   },
   watch: {
-    '$route' (to, from) {
-      this.is_loading = true
-      this.loadContent()
+    $route(to, from) {
+      this.is_loading = true;
+      this.loadContent();
     }
   },
   methods: {
@@ -118,31 +176,34 @@ export default {
       const resultStatus = await this.loadStatus(user_course_id, course_id);
 
       if (resultStatus.data) {
-        this.status = resultStatus.data
+        this.status = resultStatus.data;
       }
 
       switch (type) {
         case "course":
           const resultCourse = await this.loadCourse(user_course_id, course_id);
           if (resultCourse.data) {
-            this.content = resultCourse.data
+            this.content = resultCourse.data;
           }
           break;
         case "lessons":
-          const resultLesson = await this.loadLesson(user_course_id, content_id);
+          const resultLesson = await this.loadLesson(
+            user_course_id,
+            content_id
+          );
           if (resultLesson.data) {
-            this.content = resultLesson.data
+            this.content = resultLesson.data;
           }
           break;
         case "quizzes":
           const resultQuiz = await this.loadQuiz(user_course_id, content_id);
           if (resultQuiz.data) {
-            this.content = resultQuiz.data
+            this.content = resultQuiz.data;
           }
           break;
       }
 
-      this.is_loading = false
+      this.is_loading = false;
     },
     async loadCourse(user_course_id, course_id) {
       const { data } = await this.$http({
@@ -150,7 +211,7 @@ export default {
         method: "GET"
       });
 
-      return data
+      return data;
     },
     async loadLesson(user_course_id, content_id) {
       const { data } = await this.$http({
@@ -158,7 +219,7 @@ export default {
         method: "GET"
       });
 
-      return data
+      return data;
     },
     async loadQuiz(user_course_id, content_id) {
       const { data } = await this.$http({
@@ -166,7 +227,7 @@ export default {
         method: "GET"
       });
 
-      return data
+      return data;
     },
     async loadStatus(user_course_id, course_id) {
       const { data } = await this.$http({
@@ -174,29 +235,42 @@ export default {
         method: "GET"
       });
 
-      return data
+      return data;
     },
     createPage(course_id, user_course_id, module_id, type, content_id) {
-      const { path } = this.$route
-      const nextPage = `/room/${course_id}/${user_course_id}/${module_id}/${type}/${content_id}`
+      const { path } = this.$route;
+      const nextPage = `/room/${course_id}/${user_course_id}/${module_id}/${type}/${content_id}`;
 
       return {
         current: path,
         next_page: nextPage
-      }
+      };
     },
-    detectPage(forRouter, course_id, user_course_id, module_id, type, content_id = 0) {
-      const { current, next_page } = this.createPage(course_id, user_course_id, module_id, type, content_id)
+    detectPage(
+      forRouter,
+      course_id,
+      user_course_id,
+      module_id,
+      type,
+      content_id = 0
+    ) {
+      const { current, next_page } = this.createPage(
+        course_id,
+        user_course_id,
+        module_id,
+        type,
+        content_id
+      );
 
       if (current !== next_page) {
         if (forRouter) {
-          this.$router.push(next_page)
+          this.$router.push(next_page);
         } else {
-          return false
+          return false;
         }
       }
 
-      return true
+      return true;
     }
   }
 };
@@ -225,10 +299,10 @@ export default {
       width: 14px;
     }
     &:hover {
-      background-color: rgba($color: #1A1A1A, $alpha: 0.2);
+      background-color: rgba($color: #1a1a1a, $alpha: 0.2);
     }
     &.state-completed {
-      background-color: #1A1A1A;
+      background-color: #1a1a1a;
       color: #ffffff;
     }
     &.state-current {

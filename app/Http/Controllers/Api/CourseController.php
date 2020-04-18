@@ -15,7 +15,8 @@ class CourseController extends Controller
 {
     public function generalList(Request $request) {
         try {
-            $courses = Course::paginate(10);
+            $courses = Course::where('status', 1)->paginate(10);
+            $courses->withPath('/master/courses');
 
             return response()->json($courses, 200);
         } catch (\Throwable $th) {
@@ -155,7 +156,7 @@ class CourseController extends Controller
 
     public function reportTotal(Request $request) {
         try {
-            $courseData = Course::count();
+            $courseData = Course::where('status', 1)->count();
 
             return response()->json([
                 'error'   => false,
@@ -178,15 +179,50 @@ class CourseController extends Controller
 
         try {
             if ($entity || $includes) {
+                $coursesModules = [];
+                $coursesLessons = [];
+                $coursesQuizzes = [];
+
                 $courses = Course::find($entity ?? explode(',', $includes));
+
+
+                foreach ($courses->modules as $module) {
+                    $coursesModules[] = [
+                        'value' => $module['id'],
+                        'text' => $module['title'],
+                    ];
+
+                    $coursesLessons[$module['id']] = [];
+                    foreach ($module->lessons as $lesson) {
+                        $coursesLessons[$module['id']][] = [
+                            'value' => $lesson['id'],
+                            'text' => $lesson['title'],
+                        ];
+                    }
+                    $coursesQuizzes[$module['id']] = [];
+                    foreach ($module->quizzes as $quiz) {
+                        $coursesQuizzes[$module['id']][] = [
+                            'value' => $quiz['id'],
+                            'text' => $quiz['title'],
+                        ];
+                    }
+                }
+
+                unset($courses['modules']);
+
+                $courses['modules'] = $coursesModules;
+                $courses['lessons'] = $coursesLessons;
+                $courses['quizzes'] = $coursesQuizzes;
             }
     
             else if ($trashed) {
-                $courses = Course::onlyTrashed()->paginate(30);
+                $courses = Course::where('status', '>', -1)->onlyTrashed()->paginate(10);
+                $courses->withPath('/master/courses');
             }
     
             else {
-                $courses = Course::paginate(30);
+                $courses = Course::where('status', '>', -1)->paginate(10);
+                $courses->withPath('/master/courses');
             }
     
             return response()->json($courses, 200);
@@ -203,8 +239,7 @@ class CourseController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'required|string',
             'description' => 'required|string',
-            'content' => 'required|string',
-            'status' => 'integer',
+            'content' => 'string',
         ]);
 
         if($validator->fails()){
@@ -219,8 +254,8 @@ class CourseController extends Controller
             $course = Course::create([
                 'title' => $request->get('title'), // Max 200 char
                 'description' => $request->get('description'), // Max 200 char
-                'content' => $request->get('content'),
-                'status' => $request->get('status') ?? 1,
+                'content' => $request->get('content') ?? '',
+                'status' => 0,
             ]);
     
             return response()->json([
