@@ -60,12 +60,13 @@
           @contentChange="onContentChange"
         />
       </b-form-group>
-      <b-button class="mr-3" variant="success" @click="saveLesson">
-        Save Change
+      <b-button class="mr-3" variant="success" @click="saveLesson" :disabled="isLoading">
+        <span v-if="!isLoading">Save Change</span>
+        <b-spinner v-else small></b-spinner>
       </b-button>
       <b-button
         class="mr-3"
-        v-if="!course.status && !isCreateAction"
+        v-if="!course.status && course.has_user === 0 && !isCreateAction"
         variant="danger"
         @click="deleteLesson"
       >
@@ -93,6 +94,7 @@ export default {
   },
   data() {
     return {
+      isLoading: false,
       isLoadedState: true,
       isCreateAction: false,
       moduleSelected: null,
@@ -207,7 +209,11 @@ export default {
         return;
       }
 
-      this.lessonData.content = this.lessonDataContent;
+      if (this.lessonDataContent) {
+        this.lessonData.content = this.lessonDataContent;
+      }
+
+      this.isLoading = true
 
       if (this.isCreateAction) {
         this.$http({
@@ -226,6 +232,7 @@ export default {
             });
             this.lessonData = null;
             this.lessonSelected = null;
+            this.isLoading = false
           }
         );
       } else {
@@ -237,6 +244,7 @@ export default {
           this.updateCombobox(this.lessonData);
           this.lessonData = null;
           this.lessonSelected = null;
+          this.isLoading = false
         });
       }
     },

@@ -9,11 +9,8 @@
             You already completed this quiz with
             <strong>total score {{ quizData.score_number }}</strong>
           </div>
-          <div v-else class="alert alert-warning">
-            <span v-if="quizData.last_quiz">
-              This is your final quiz, make sure you answer all questions
-              correctly
-            </span>
+          <div v-if="quizData.last_quiz" class="alert alert-warning">
+            This is your final quiz, make sure you answer all questions correctly
           </div>
         </div>
         <hr />
@@ -62,8 +59,9 @@
       class="card card-default"
     >
       <div class="card-body text-center">
-        <button class="btn btn-outline-primary" @click="changeState">
-          Save All Answer
+        <button class="btn btn-outline-primary" @click="changeState" :disabled="isLoading">
+          <span v-if="!isLoading">Save All Answer</span>
+          <b-spinner v-else small></b-spinner>  
         </button>
       </div>
     </div>
@@ -71,8 +69,6 @@
 </template>
 
 <script>
-import markdown from "marked";
-
 export default {
   props: {
     content: {
@@ -86,6 +82,7 @@ export default {
   },
   data() {
     return {
+      isLoading: false,
       quizData: [],
       quizChoices: {}
     };
@@ -94,9 +91,6 @@ export default {
     this.quizData = this.status[this.content.id];
   },
   methods: {
-    compileToHTML(text) {
-      return markdown(text, { sanitize: true });
-    },
     isChecked(question, choice) {
       let checked = false;
 
@@ -131,6 +125,8 @@ export default {
         params: { user_course_id }
       } = this.$route;
 
+      this.isLoading = true;
+
       // show popup to make sure
 
       Promise.all(
@@ -146,6 +142,7 @@ export default {
           });
         })
       ).then(() => {
+        this.isLoading = false;
         // do something with data here
         window.location.reload();
       });

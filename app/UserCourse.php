@@ -24,7 +24,7 @@ class UserCourse extends Model
    */
   public function course()
   {
-      return $this->belongsTo('App\Course')->select('id', 'title', 'status', 'created_at');
+      return $this->belongsTo('App\Course')->select('id', 'title', 'status', 'description', 'created_at')->where('status', 1);
   }
 
   /**

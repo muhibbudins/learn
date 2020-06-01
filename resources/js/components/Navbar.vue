@@ -85,7 +85,7 @@ export default {
         student: [
           {
             name: "Home",
-            path: "student"
+            path: "home"
           },
           {
             name: "Courses",
@@ -107,10 +107,10 @@ export default {
             name: "Home",
             path: "home"
           },
-          // {
-          //   name: "Register",
-          //   path: "register"
-          // },
+          {
+            name: "Register",
+            path: "register"
+          },
           {
             name: "Login",
             path: "login",

@@ -8,7 +8,7 @@
         class="btn btn-primary btn-block"
         @click="
           $router.push(
-            `/room/${userCourse.course_id}/${userCourse.course.id}/0/course/0`
+            `/room/${userCourse.course_id}/${userCourse.id}/0/course/0`
           )
         "
       >

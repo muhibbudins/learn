@@ -14,13 +14,25 @@
             <p>{{ course.created_at }}</p>
             <div
               v-if="course.content"
-              v-html="compileToHTML(course.content)"
+              v-html="course.content"
             ></div>
             <button
+              v-if="!alreadyJoined"
               class="btn btn-primary"
-              @click="$router.push({ name: $auth.check() ? '' : 'login' })"
+              @click="joinCourse"
             >
               Join Course
+            </button>
+            <button
+              v-else
+              class="btn btn-primary"
+              @click="
+                $router.push(
+                  `/room/${userCourse.course_id}/${userCourse.id}/0/course/0`
+                )
+              "
+            >
+              Open Class
             </button>
           </div>
           <div class="col-5">
@@ -61,17 +73,24 @@
 </template>
 
 <script>
-import markdown from "marked";
-
 export default {
   data() {
     return {
-      course: {}
+      course: {},
+      alreadyJoined: 0,
+      course_id: 0,
+      userCourse: {},
     };
   },
   mounted() {
     const { id } = this.$route.params;
+    this.course_id = id;
+
     this.getCourses(id);
+
+    if (this.$auth.check()) {
+      this.getUserCourse(this.$auth.user().id);
+    }
   },
   methods: {
     getCourses(id) {
@@ -82,8 +101,39 @@ export default {
         this.course = data.data;
       });
     },
-    compileToHTML(text) {
-      return markdown(text, { sanitize: true });
+    getUserCourse(user_id) {
+      this.$http({
+        url: `/v1/account/course`,
+        method: "GET",
+        params: {
+          user_id,
+          course_id: this.course_id
+        }
+      }).then(({ data }) => {
+        if (data.data) {
+          this.userCourse = data.data;
+          this.alreadyJoined = true
+        }
+      });
+    },
+    joinCourse() {
+      const { id } = this.$auth.user()
+
+      if (this.$auth.check()) {
+        this.$http({
+          url: `/v1/account/course/join`,
+          method: "POST",
+          data: {
+            course_id: this.course_id.toString(),
+            user_id: id.toString(),
+          }
+        }).then(({ data }) => {
+          this.alreadyJoined = true
+          this.getUserCourse(id)
+        });
+      } else {
+        this.$router.push({ name: 'login' })
+      }
     }
   }
 };

@@ -46,12 +46,13 @@
           Enter at least 3 letters
         </b-form-invalid-feedback>
       </b-form-group>
-      <b-button class="mr-3" variant="success" @click="saveModule">
-        Save Change
+      <b-button class="mr-3" variant="success" @click="saveModule" :disabled="isLoading">
+        <span v-if="!isLoading">Save Change</span>
+        <b-spinner v-else small></b-spinner>
       </b-button>
       <b-button
         class="mr-3"
-        v-if="!course.status && !isCreateAction"
+        v-if="!course.status && course.has_user === 0 && !isCreateAction"
         variant="danger"
         @click="deleteModule"
       >
@@ -79,6 +80,7 @@ export default {
   },
   data() {
     return {
+      isLoading: false,
       isCreateAction: false,
       moduleData: null,
       moduleSelected: null,
@@ -150,6 +152,8 @@ export default {
         return;
       }
 
+      this.isLoading = true;
+
       if (this.isCreateAction) {
         this.$http({
           url: "/v1/master/module",
@@ -161,6 +165,7 @@ export default {
               data: { id, title }
             }
           }) => {
+            this.isLoading = false;
             this.moduleOptions.push({
               value: id,
               text: title
@@ -178,6 +183,7 @@ export default {
           this.updateCombobox(this.moduleData);
           this.moduleData = null;
           this.moduleSelected = null;
+          this.isLoading = false;
         });
       }
     },

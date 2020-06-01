@@ -21,7 +21,6 @@ const Detail = require("./pages/general/detail").default;
 const Room = require("./pages/room/index").default;
 
 // Student
-const Student = require("./pages/student/index").default;
 const StudentCourse = require("./pages/student/course").default;
 const StudentProfile = require("./pages/student/profile").default;
 
@@ -128,14 +127,6 @@ const routes = [
   },
 
   // Student
-  {
-    path: "/student",
-    name: "student",
-    component: Student,
-    meta: {
-      auth: true
-    }
-  },
   {
     path: "/student/courses",
     name: "student-courses",

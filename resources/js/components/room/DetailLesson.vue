@@ -6,7 +6,7 @@
         <p>{{ content.description }}</p>
         <div
           v-if="content.content"
-          v-html="compileToHTML(content.content)"
+          v-html="content.content"
         ></div>
       </div>
     </div>
@@ -33,8 +33,6 @@
 </template>
 
 <script>
-import markdown from "marked";
-
 export default {
   props: {
     content: {
@@ -55,9 +53,6 @@ export default {
     this.lessonData = this.status[this.content.id];
   },
   methods: {
-    compileToHTML(text) {
-      return markdown(text, { sanitize: true });
-    },
     async changeState() {
       const {
         params: { user_course_id, content_id }

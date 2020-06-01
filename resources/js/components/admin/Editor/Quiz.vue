@@ -58,7 +58,7 @@
         </b-button>
         <b-button
           v-if="
-            !course.status && !isCreateAction && quizData.questions.length === 0
+            !course.status && course.has_user === 0 && !isCreateAction && quizData.questions.length === 0
           "
           class="mr-3"
           variant="danger"
@@ -109,7 +109,7 @@
               Save Question
             </b-button>
             <b-button
-              v-if="!course.status && question.choices.length === 0"
+              v-if="!course.status && course.has_user === 0 && question.choices.length === 0"
               size="sm"
               variant="danger"
               @click="deleteQuestion(questionIndex)"

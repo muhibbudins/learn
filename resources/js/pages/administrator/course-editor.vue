@@ -9,10 +9,15 @@
             </h6>
           </div>
           <div class="col-4 ml-auto text-right">
-            <b-button v-if="course.status" size="sm" variant="secondary">
-              &nbsp;
+            <b-button
+              v-if="course.status"
+              size="sm"
+              variant="warning"
+              @click="unPublishCourse"
+            >
+              Unpublish Course
             </b-button>
-            <b-button v-else size="sm" variant="info">
+            <b-button v-else size="sm" variant="info" @click="publishCourse">
               Publish Course
             </b-button>
           </div>
@@ -81,6 +86,7 @@ export default {
   data() {
     return {
       course: {},
+      courseId: 0,
       isLoaded: false
     };
   },
@@ -94,9 +100,30 @@ export default {
     const {
       params: { course_id }
     } = this.$route;
+    this.courseId = course_id;
     this.getCourses(course_id);
   },
   methods: {
+    unPublishCourse() {
+      this.course.status = "0";
+      this.$http({
+        url: `/v1/master/course/update/${this.courseId}`,
+        method: "POST",
+        data: this.course
+      }).then(({ data: { data } }) => {
+        this.getCourses(this.courseId);
+      });
+    },
+    publishCourse() {
+      this.course.status = "1";
+      this.$http({
+        url: `/v1/master/course/update/${this.courseId}`,
+        method: "POST",
+        data: this.course
+      }).then(({ data: { data } }) => {
+        this.getCourses(this.courseId);
+      });
+    },
     getCourses(entity) {
       this.$http({
         url: `/v1/master/course?entity=${entity}`,

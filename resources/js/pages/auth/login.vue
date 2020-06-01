@@ -30,6 +30,7 @@
                   type="password"
                   id="password"
                   class="form-control"
+                  placeholder="password"
                   v-model="password"
                   required
                 />
@@ -48,8 +49,8 @@
 export default {
   data() {
     return {
-      email: "admin@e-learning.com",
-      password: "admin",
+      email: "",
+      password: "",
       has_error: false
     };
   },

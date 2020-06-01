@@ -64,8 +64,9 @@
             Only for update password
           </small>
         </div>
-        <b-button class="mr-3" variant="success" @click="saveUser">
-          Save Change
+        <b-button class="mr-3" variant="success" @click="saveUser" :disabled="isLoading">
+          <span v-if="!isLoading">Save Change</span>
+          <b-spinner v-else small></b-spinner>
         </b-button>
         <b-button @click="$router.back()">
           Cancel
@@ -81,6 +82,7 @@ export default {
   data() {
     return {
       userData: {},
+      isLoading: false,
       currentId: 0
     };
   },
@@ -104,12 +106,15 @@ export default {
   },
   methods: {
     saveUser() {
+      this.isLoading = true;
+
       if (!this.currentId) {
         this.$http({
           url: "/v1/master/user",
           method: "POST",
           data: this.userData
         }).then(({ data }) => {
+          this.isLoading = false;
           this.$router.back();
         });
       } else {
@@ -118,6 +123,7 @@ export default {
           method: "POST",
           data: this.userData
         }).then(({ data }) => {
+          this.isLoading = false;
           this.$router.back();
         });
       }

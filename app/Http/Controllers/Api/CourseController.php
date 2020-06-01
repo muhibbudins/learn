@@ -184,8 +184,11 @@ class CourseController extends Controller
                 $coursesQuizzes = [];
 
                 $courses = Course::find($entity ?? explode(',', $includes));
+                $hasUser = UserCourse::where([
+                    'course_id' => $entity
+                ])->count();
 
-
+                $courses['has_user'] = $hasUser;
                 foreach ($courses->modules as $module) {
                     $coursesModules[] = [
                         'value' => $module['id'],
@@ -277,7 +280,6 @@ class CourseController extends Controller
             'title' => 'string',
             'description' => 'string',
             'content' => 'string',
-            'status' => 'integer',
         ]);
 
         if($validator->fails()){
@@ -322,8 +324,8 @@ class CourseController extends Controller
             if ($request->get('content')) {
                 $courseData->content = $request->get('content');
             }
-            if ($request->get('status')) {
-                $courseData->status = $request->get('status');
+            if ($request->get('status') !== null) {
+                $courseData->status = (int) $request->get('status');
             }
 
             $courseData->save();

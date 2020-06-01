@@ -258,14 +258,27 @@ class UserCourseController extends Controller
         $entity = $request->get('entity');
         $includes = $request->get('includes');
         $trashed = $request->get('trashed');
+        $user_id = $request->get('user_id');
+        $course_id = $request->get('course_id');
 
         try {
             // Force get only user data when access role not admin
             if (Auth::user()->role !== 'admin') {
-                $userCourseData = UserCourse::where('user_id', Auth::user()->id)->get();
+                if ($user_id && $course_id) {
+                    $userCourseData = UserCourse::where([
+                        ['user_id', '=', $user_id],
+                        ['course_id', '=', $course_id],
+                    ])->first();
+                    
+                    if ($userCourseData) {
+                        $userCourseData->course;
+                    }
+                } else {
+                    $userCourseData = UserCourse::where('user_id', Auth::user()->id)->get();
 
-                foreach ($userCourseData as $userCourse) {
-                    $userCourse->course;
+                    foreach ($userCourseData as $userCourse) {
+                        $userCourse->course;
+                    }
                 }
 
                 $userCourses = [
