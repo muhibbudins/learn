@@ -67,8 +67,15 @@ export default {
           fetchUser: true
         })
         .then(
-          function() {},
-          function() {
+          () => {
+            const { ref } = this.$route.query
+            if (ref) {
+              this.$router.push(ref)
+            } else {
+              this.$router.push({ name: 'student-profile' })
+            }
+          },
+          () => {
             app.has_error = true;
           }
         );

@@ -3,6 +3,7 @@
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 use App\User;
 use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
 use Faker\Generator as Faker;
 
 /*
@@ -17,11 +18,17 @@ use Faker\Generator as Faker;
 */
 
 $factory->define(User::class, function (Faker $faker) {
+    $date = Carbon::create(2020, 1, 1, 0, 0, 0);
+    $email = $faker->email;
+    $current = $date->addDays(rand(1, 200))->format('Y-m-d H:i:s');
+
     return [
-        'name' => $faker->name,
-        'email' => $faker->unique()->safeEmail,
-        'email_verified_at' => now(),
-        'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+        'name' => strstr($email, '@', true),
+        'email' => $email,
+        'email_verified_at' => $current,
+        'password' => Hash::make('student'),
+        'role' => 'student',
+        'created_at' => $current,
         'remember_token' => Str::random(10),
     ];
 });

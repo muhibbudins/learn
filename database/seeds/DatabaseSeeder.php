@@ -1,8 +1,6 @@
 <?php
 
-use App\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,7 +11,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // $this->call(UsersTableSeeder::class);
         User::create([
             'name' => 'Admin',
             'email' => 'admin@e-learning.com',
@@ -22,7 +19,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         User::create([
-            'name' => 'Lecturer',
+            'name' => 'Sample Lecturer',
             'email' => 'lecturer@e-learning.com',
             'password' => Hash::make('lecturer'),
             'role' => 'admin'
@@ -35,12 +32,7 @@ class DatabaseSeeder extends Seeder
             'role' => 'student'
         ]);
 
-        User::create([
-            'name' => 'Guest',
-            'email' => 'guest@e-learning.com',
-            'password' => Hash::make('guest'),
-            'role' => 'guest'
-        ]);
+        factory(App\User::class, 300)->create();
 
         // run with php artisan migrate --seed
     }

@@ -52,7 +52,7 @@
                   type="email"
                   id="email"
                   class="form-control"
-                  placeholder="user@e-learning.com"
+                  placeholder="E-mail"
                   v-model="email"
                 />
                 <span class="help-block" v-if="has_error && errors.email">{{

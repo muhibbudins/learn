@@ -117,9 +117,8 @@ export default {
       });
     },
     joinCourse() {
-      const { id } = this.$auth.user()
-
       if (this.$auth.check()) {
+        const { id } = this.$auth.user()
         this.$http({
           url: `/v1/account/course/join`,
           method: "POST",
@@ -132,7 +131,7 @@ export default {
           this.getUserCourse(id)
         });
       } else {
-        this.$router.push({ name: 'login' })
+        this.$router.push({ name: 'login', query: { ref: this.$route.path } })
       }
     }
   }

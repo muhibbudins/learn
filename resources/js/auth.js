@@ -13,7 +13,7 @@ const config = {
   loginData: {
     url: "v1/auth/login",
     method: "POST",
-    redirect: "/",
+    redirect: "",
     fetchUser: true
   },
   logoutData: {

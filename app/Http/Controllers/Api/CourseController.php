@@ -176,6 +176,7 @@ class CourseController extends Controller
         $entity = $request->get('entity');
         $includes = $request->get('includes');
         $trashed = $request->get('trashed');
+        $keyword = $request->get('keyword');
 
         try {
             if ($entity || $includes) {
@@ -224,7 +225,7 @@ class CourseController extends Controller
             }
     
             else {
-                $courses = Course::where('status', '>', -1)->paginate(10);
+                $courses = Course::where('status', '>', -1)->where('title', 'like', '%'. $keyword .'%')->paginate(10);
                 $courses->withPath('/master/courses');
             }
     

@@ -1,57 +1,43 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <router-link
-      class="navbar-brand"
-      to="/"
-    >
-      E-Learning
-    </router-link>
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-toggle="collapse"
-      data-target="#navbarSupportedContent"
-      aria-controls="navbarSupportedContent"
-      aria-expanded="false"
-      aria-label="Toggle navigation"
-    >
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <div class="navbar-nav ml-auto">
-        <div
-          v-for="(route, key) in routes[
-            $auth.check('admin')
-              ? 'admin'
-              : $auth.check()
-              ? 'student'
-              : 'general'
-          ]"
-          v-bind:key="route.path"
-        >
-          <div class="nav-item">
-            <router-link
-              v-if="route.path"
-              class="nav-link"
-              :to="{ name: route.path }"
-              :key="key"
-            >
-              {{ route.name }}
-            </router-link>
-            <a
-              v-else-if="route.logout"
-              class="nav-link"
-              href="#"
-              @click="loggingOut"
-            >
-              {{ route.name }}
-            </a>
+  <b-navbar toggleable="lg" type="light" class="navbar navbar-expand-lg navbar-light bg-light">
+    <b-container>
+      <b-navbar-brand to="/">E-Learning</b-navbar-brand>
+      <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+      <b-collapse id="nav-collapse" is-nav>
+        <div class="navbar-nav ml-auto">
+          <div
+            v-for="(route, key) in routes[
+              $auth.check('admin')
+                ? 'admin'
+                : $auth.check()
+                ? 'student'
+                : 'general'
+            ]"
+            v-bind:key="route.path"
+          >
+            <div class="nav-item">
+              <router-link
+                v-if="route.path"
+                class="nav-link"
+                :to="{ name: route.path }"
+                :key="key"
+              >
+                {{ route.name }}
+              </router-link>
+              <a
+                v-else-if="route.logout"
+                class="nav-link"
+                href="#"
+                @click="loggingOut"
+              >
+                {{ route.name }}
+              </a>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-  </nav>
+      </b-collapse>
+    </b-container>
+  </b-navbar>
 </template>
 
 <script>
@@ -70,12 +56,12 @@ export default {
             path: "dashboard-courses"
           },
           {
-            name: "User Course",
-            path: "dashboard-user-course"
-          },
-          {
             name: "User",
             path: "dashboard-user"
+          },
+          {
+            name: "User Course",
+            path: "dashboard-user-course"
           },
           {
             name: "Logout",

@@ -176,6 +176,7 @@ class UserController extends Controller
         $entity = $request->get('entity');
         $includes = $request->get('includes');
         $trashed = $request->get('trashed');
+        $keyword = $request->get('keyword');
 
         try {
             // Force get only user data when access role not admin
@@ -193,7 +194,7 @@ class UserController extends Controller
             }
     
             else {
-                $users = User::paginate(10);
+                $users = User::where('name', 'like', '%'. $keyword .'%')->paginate(10);
                 $users->withPath('/master/user');
             }
     

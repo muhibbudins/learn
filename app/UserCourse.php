@@ -50,4 +50,13 @@ class UserCourse extends Model
   {
       return $this->hasMany('App\UserCourseQuiz');
   }
+
+  public static function boot() {
+    parent::boot();
+
+    static::deleting(function($userCourse) { // before delete() method call this
+         $userCourse->modules()->delete();
+         $userCourse->quizzes()->delete();
+    });
+  }
 }
