@@ -25,7 +25,6 @@
             </button>
           </div>
           <apexchart
-            v-if="series.length > 0"
             type="area"
             height="350"
             ref="chart"

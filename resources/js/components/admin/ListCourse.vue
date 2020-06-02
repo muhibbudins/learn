@@ -47,7 +47,7 @@ export default {
   data() {
     return {
       errorMessage: false,
-      fields: ["id", "title", "status", "updated_at", "actions"],
+      fields: ["title", "status", "updated_at", "actions"],
       courses: {},
       keyword: ""
     };

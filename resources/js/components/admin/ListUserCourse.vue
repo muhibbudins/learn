@@ -23,10 +23,6 @@ export default {
       errorMessage: false,
       fields: [
         {
-          key: "id",
-          label: "ID"
-        },
-        {
           key: "user.name",
           label: "Username"
         },
