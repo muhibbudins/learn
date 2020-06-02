@@ -122,7 +122,7 @@ class UserController extends Controller
             //     ['created_at', '>', 'DATE_SUB(NOW(), INTERVAL 1 YEAR)'],
             //     ['role', '=', 'student']
             // ])->selectRaw('DATE(created_at) as date, role')->get();
-            $allUsers = User::selectRaw('DATE(created_at) as date, role')->get();
+            $allUsers = User::selectRaw('DATE(created_at) as date, role')->where('role', '=', 'student')->get();
 
             foreach ($allUsers as $user) {
                 $timestamp = strtotime($user->date);
