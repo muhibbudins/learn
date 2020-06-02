@@ -117,10 +117,12 @@ class UserController extends Controller
             $allReport = [];
             $allReportTemp = [];
             $allReportRoles = [];
-            $allUsers = User::where([
-                ['created_at', '>', 'DATE_SUB(NOW(), INTERVAL 1 YEAR)'],
-                ['role', '=', 'student']
-            ])->selectRaw('DATE(created_at) as date, role')->get();
+            // Disable this query cause mysql version on server is Ver 14.14 Distrib 5.7.30
+            // $allUsers = User::where([
+            //     ['created_at', '>', 'DATE_SUB(NOW(), INTERVAL 1 YEAR)'],
+            //     ['role', '=', 'student']
+            // ])->selectRaw('DATE(created_at) as date, role')->get();
+            $allUsers = User::selectRaw('DATE(created_at) as date, role')->get();
 
             foreach ($allUsers as $user) {
                 $timestamp = strtotime($user->date);
