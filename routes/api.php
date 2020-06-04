@@ -133,6 +133,7 @@ Route::middleware(['administrator'])->prefix('v1')->group(function () {
         Route::post('module/quiz/choice/update/{id}', 'Api\ModuleQuizChoiceController@update');
 
         Route::get('user', 'Api\UserController@read');
+        Route::get('student/{course}', 'Api\UserController@student');
         Route::post('user', 'Api\UserController@create');
         Route::post('user/update/{id}', 'Api\UserController@update'); 
 

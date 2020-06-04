@@ -46,7 +46,12 @@
           Enter at least 3 letters
         </b-form-invalid-feedback>
       </b-form-group>
-      <b-button class="mr-3" variant="success" @click="saveModule" :disabled="isLoading">
+      <b-button
+        class="mr-3"
+        variant="success"
+        @click="saveModule"
+        :disabled="isLoading"
+      >
         <span v-if="!isLoading">Save Change</span>
         <b-spinner v-else small></b-spinner>
       </b-button>
@@ -152,6 +157,9 @@ export default {
         return;
       }
 
+      this.moduleState.title = null;
+      this.moduleState.description = null;
+
       this.isLoading = true;
 
       if (this.isCreateAction) {
@@ -159,32 +167,64 @@ export default {
           url: "/v1/master/module",
           method: "POST",
           data: this.moduleData
-        }).then(
-          ({
-            data: {
-              data: { id, title }
+        })
+          .then(
+            ({
+              data: {
+                data: { id, title }
+              }
+            }) => {
+              this.isLoading = false;
+              this.moduleOptions.push({
+                value: id,
+                text: title
+              });
+              this.moduleData = null;
+              this.moduleSelected = null;
+              this.$emit("need-update", 1);
             }
-          }) => {
+          )
+          .catch(({ response: { data } }) => {
+            if (data.messages) {
+              for (const parameter in data.messages) {
+                this.$notify({
+                  group: "alert",
+                  type: "warn",
+                  title: `Upps! Invalid parameter ${parameter}.`,
+                  text: data.messages[parameter].join("\n")
+                });
+              }
+            }
+
             this.isLoading = false;
-            this.moduleOptions.push({
-              value: id,
-              text: title
-            });
-            this.moduleData = null;
-            this.moduleSelected = null;
-          }
-        );
+          });
       } else {
         this.$http({
           url: `/v1/master/module/update/${this.moduleSelected}`,
           method: "POST",
           data: this.moduleData
-        }).then(({ data }) => {
-          this.updateCombobox(this.moduleData);
-          this.moduleData = null;
-          this.moduleSelected = null;
-          this.isLoading = false;
-        });
+        })
+          .then(({ data }) => {
+            this.updateCombobox(this.moduleData);
+            this.moduleData = null;
+            this.moduleSelected = null;
+            this.$emit("need-update", 1);
+            this.isLoading = false;
+          })
+          .catch(({ response: { data } }) => {
+            if (data.messages) {
+              for (const parameter in data.messages) {
+                this.$notify({
+                  group: "alert",
+                  type: "warn",
+                  title: `Upps! Invalid parameter ${parameter}.`,
+                  text: data.messages[parameter].join("\n")
+                });
+              }
+            }
+
+            this.isLoading = false;
+          });
       }
     },
     deleteModule() {
@@ -195,6 +235,7 @@ export default {
         this.updateCombobox(this.moduleData, true);
         this.moduleData = null;
         this.moduleSelected = null;
+        this.$emit("need-update", 1);
       });
     }
   }

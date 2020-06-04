@@ -6,6 +6,7 @@
 
 import "es6-promise/auto"
 import "../css/lux.min.css"
+import "vue-multiselect/dist/vue-multiselect.min.css"
 
 import axios from "axios"
 import Vue from "vue"
@@ -13,6 +14,8 @@ import VueAuth from "@websanova/vue-auth"
 import VueAxios from "vue-axios"
 import VueRouter from "vue-router"
 import VueApexCharts from 'vue-apexcharts'
+import VueNotifications from 'vue-notification'
+import VueMultiselect from 'vue-multiselect'
 import Index from "./Index"
 import auth from "./auth"
 import router from "./router"
@@ -22,6 +25,7 @@ import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 Vue.use(BootstrapVue)
 // Optionally install the BootstrapVue icon components plugin
 Vue.use(IconsPlugin)
+Vue.use(VueNotifications)
 
 // Set Vue globally
 window.Vue = Vue;
@@ -39,6 +43,7 @@ axios.defaults.baseURL = `${process.env.MIX_APP_URL}/api`;
 Vue.use(VueAuth, auth);
 
 Vue.component('apexchart', VueApexCharts)
+Vue.component('multiselect', VueMultiselect)
 
 /**
  * The following block of code may be used to automatically register your

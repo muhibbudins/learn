@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\User;
+use App\UserCourse;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -190,6 +191,30 @@ class UserController extends Controller
             return response()->json([
                 'error'   => true,
                 'message' => 'Something went wrong when reporting student',
+                'data'    => []
+            ], 500);
+        }
+    }
+
+    public function student(Request $request, $course) {
+        try {
+            $allStudent = UserCourse::select('user_id')->where('course_id', '=', $course)->pluck('user_id')->toArray();
+            $allJoinedUsers = User::select('id', 'name')->where('role', '=', 'student')->whereIn('id', $allStudent)->get();
+            $allAvailableUsers = User::select('id', 'name')->where('role', '=', 'student')->whereNotIn('id', $allStudent)->get();
+    
+            return response()->json([
+                'error'   => false,
+                'message' => 'Successfully creating a report for student',
+                'data'    => [
+                    'course' => $course,
+                    'joined' => $allJoinedUsers,
+                    'available' => $allAvailableUsers,
+                ]
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error'   => true,
+                'message' => 'Something went wrong when reading a user',
                 'data'    => []
             ], 500);
         }

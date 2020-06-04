@@ -58,7 +58,10 @@
         </b-button>
         <b-button
           v-if="
-            !course.status && course.has_user === 0 && !isCreateAction && quizData.questions.length === 0
+            !course.status &&
+              course.has_user === 0 &&
+              !isCreateAction &&
+              quizData.questions.length === 0
           "
           class="mr-3"
           variant="danger"
@@ -109,7 +112,11 @@
               Save Question
             </b-button>
             <b-button
-              v-if="!course.status && course.has_user === 0 && question.choices.length === 0"
+              v-if="
+                !course.status &&
+                  course.has_user === 0 &&
+                  question.choices.length === 0
+              "
               size="sm"
               variant="danger"
               @click="deleteQuestion(questionIndex)"
@@ -123,7 +130,7 @@
           accordion="choices-accordion"
           class="mt-3 text-center"
         >
-          <b-card>
+          <b-card v-if="isChoicesRendered">
             <div
               class="row align-items-center mb-3"
               v-for="(choice, choiceIndex) in question.choices"
@@ -148,6 +155,7 @@
               <div class="col-3">
                 <b-form-radio
                   v-model="question.answer"
+                  :disabled="!choice.id"
                   :value="choice.id"
                   class="mb-2 mr-sm-2 mb-sm-0"
                   :name="`input-answer-question-${questionIndex}`"
@@ -211,6 +219,7 @@ export default {
       numericChoices: ["A", "B", "C", "D", "E"],
       isLoadedState: true,
       isCreateAction: false,
+      isChoicesRendered: true,
       moduleSelected: null,
       moduleOptions: [],
       quizData: null,
@@ -331,14 +340,6 @@ export default {
         });
       }, 100);
     },
-    addNewAnswer(e, questionIndex) {
-      this.quizData.questions[questionIndex].choices.push({
-        title: "",
-        module_quiz_question_id: this.quizData.questions[questionIndex].id,
-        answer: 0
-      });
-      this.scrollToBottom(e.target);
-    },
     addNewQuestion(e) {
       this.quizData.questions.push({
         title: "",
@@ -346,6 +347,16 @@ export default {
         choices: []
       });
       this.scrollToBottom(e.target);
+    },
+    addNewAnswer(e, questionIndex) {
+      this.isChoicesRendered = false;
+      this.quizData.questions[questionIndex].choices.push({
+        title: "",
+        module_quiz_question_id: this.quizData.questions[questionIndex].id,
+        answer: 0
+      });
+      this.scrollToBottom(e.target);
+      this.isChoicesRendered = true;
     },
     createQuiz() {
       if (!this.moduleSelected) {
@@ -378,29 +389,72 @@ export default {
         return;
       }
 
+      this.quizState.title = null;
+      this.quizState.description = null;
+
       if (this.isCreateAction) {
         this.$http({
           url: "/v1/master/module/quiz",
           method: "POST",
           data: this.quizData
-        }).then(({ data: { data } }) => {
-          this.quizOptions.push({
-            value: data.id,
-            text: data.title
+        })
+          .then(({ data: { data } }) => {
+            this.quizOptions.push({
+              value: data.id,
+              text: data.title
+            });
+            this.quizSelected = data.id;
+
+            if (!data.questions) {
+              data.questions = [];
+            }
+
+            this.quizData = data;
+          })
+          .catch(({ response: { data } }) => {
+            if (data.messages) {
+              for (const parameter in data.messages) {
+                this.$notify({
+                  group: "alert",
+                  type: "warn",
+                  title: `Upps! Invalid parameter ${parameter}.`,
+                  text: data.messages[parameter].join("\n")
+                });
+              }
+            }
+
+            this.isLoading = false;
           });
-          this.quizSelected = data.id;
-          this.quizData = data;
-        });
       } else {
         this.$http({
           url: `/v1/master/module/quiz/update/${this.quizSelected}`,
           method: "POST",
           data: this.quizData
-        }).then(({ data: { data } }) => {
-          this.updateCombobox(this.quizData);
-          this.quizSelected = data.id;
-          this.quizData = data;
-        });
+        })
+          .then(({ data: { data } }) => {
+            this.updateCombobox(this.quizData);
+            this.quizSelected = data.id;
+
+            if (!data.questions) {
+              data.questions = [];
+            }
+
+            this.quizData = data;
+          })
+          .catch(({ response: { data } }) => {
+            if (data.messages) {
+              for (const parameter in data.messages) {
+                this.$notify({
+                  group: "alert",
+                  type: "warn",
+                  title: `Upps! Invalid parameter ${parameter}.`,
+                  text: data.messages[parameter].join("\n")
+                });
+              }
+            }
+
+            this.isLoading = false;
+          });
       }
     },
     saveQuestion(parentId, currentIndex) {
@@ -423,6 +477,9 @@ export default {
           method: "POST",
           data: questionData
         }).then(({ data: { data } }) => {
+          if (!data.choices) {
+            data.choices = [];
+          }
           this.quizData.questions[currentIndex] = data;
         });
       } else {
@@ -431,6 +488,9 @@ export default {
           method: "POST",
           data: questionData
         }).then(({ data: { data } }) => {
+          if (!data.choices) {
+            data.choices = [];
+          }
           this.quizData.questions[currentIndex] = data;
         });
       }
@@ -448,6 +508,8 @@ export default {
       //   return;
       // }
 
+      this.isChoicesRendered = false;
+
       if (!choiceData.id) {
         this.$http({
           url: "/v1/master/module/quiz/choice",
@@ -455,6 +517,7 @@ export default {
           data: choiceData
         }).then(({ data: { data } }) => {
           this.quizData.questions[parentIndex].choices[currentIndex] = data;
+          this.isChoicesRendered = true;
         });
       } else {
         if (questionData.answer === choiceData.id) {
@@ -468,6 +531,7 @@ export default {
           data: choiceData
         }).then(({ data: { data } }) => {
           this.quizData.questions[parentIndex].choices[currentIndex] = data;
+          this.isChoicesRendered = true;
         });
       }
     },
