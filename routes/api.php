@@ -33,6 +33,16 @@ Route::prefix('v1')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
+    | Reporting routes for general user with access to /api/v1/report/
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('report')->group(function () {
+        Route::get('course/total', 'Api\CourseController@reportTotal');
+        Route::get('user/total', 'Api\UserController@reportTotal');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
     | Authenticated routes
     |--------------------------------------------------------------------------
     */
@@ -88,7 +98,6 @@ Route::middleware(['administrator'])->prefix('v1')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::prefix('report')->group(function () {
-        Route::get('course/total', 'Api\CourseController@reportTotal');
         Route::get('course/follower', 'Api\UserCourseController@reportFollower');
         Route::get('user', 'Api\UserController@reportCount');
     });

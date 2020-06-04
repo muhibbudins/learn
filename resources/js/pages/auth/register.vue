@@ -1,10 +1,10 @@
 <template>
   <div class="container">
     <div class="row">
-      <div class="col-4 mx-auto">
+      <div class="col-12 col-md-8 col-lg-4 mx-auto">
         <div class="card card-default mb-3">
-          <div class="card-body">
-            Register Page
+          <div class="card-body text-center">
+            Create new Account
           </div>
         </div>
         <div class="card card-default">
@@ -29,12 +29,12 @@
                   'has-error': has_error && errors.email
                 }"
               >
-                <label for="name">Name</label>
+                <label for="name">Username</label>
                 <input
                   type="text"
                   id="name"
                   class="form-control"
-                  placeholder="Name"
+                  placeholder="Username"
                   v-model="name"
                 />
                 <span class="help-block" v-if="has_error && errors.name">{{
@@ -83,20 +83,25 @@
                   'has-error': has_error && errors.password
                 }"
               >
-                <label for="password_confirmation">Password Confirmation</label>
+                <label for="password_confirmation">Confirm Password</label>
                 <input
                   type="password"
                   id="password_confirmation"
-                  placeholder="Password Confirmation"
+                  placeholder="Confirmation Password"
                   class="form-control"
                   v-model="password_confirmation"
                 />
               </div>
-              <button type="submit" class="btn btn-primary">
-                Register
+              <button type="submit" class="btn btn-primary d-block mx-auto">
+                Create Account
               </button>
             </form>
           </div>
+        </div>
+        <div class="text-center mt-4">
+          <router-link to="/auth/login">
+            Already have account?
+          </router-link>
         </div>
       </div>
     </div>

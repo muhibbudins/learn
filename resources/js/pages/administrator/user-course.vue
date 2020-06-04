@@ -5,7 +5,7 @@
         <div class="row align-items-center">
           <div class="col-4">
             <h6 class="mb-0">
-              User Courses
+              User Course
             </h6>
           </div>
           <div class="col-4 ml-auto text-right">

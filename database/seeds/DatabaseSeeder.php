@@ -12,6 +12,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        /**
+         * Create default user for admin, lecturer and student
+         */
         User::create([
             'name' => 'Admin',
             'email' => 'admin@e-learning.com',
@@ -33,6 +36,9 @@ class DatabaseSeeder extends Seeder
             'role' => 'student'
         ]);
 
+        /**
+         * Create random 300 users with faker and role/password equal "student"
+         */
         factory(App\User::class, 300)->create();
 
         // run with php artisan migrate --seed

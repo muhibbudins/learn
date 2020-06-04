@@ -156,7 +156,10 @@ class CourseController extends Controller
 
     public function reportTotal(Request $request) {
         try {
-            $courseData = Course::where('status', 1)->count();
+            $courseData = [
+                'total' => Course::where('status', 1)->count(),
+                'taken' => UserCourse::groupBy('course_id')->count(),
+            ];
 
             return response()->json([
                 'error'   => false,

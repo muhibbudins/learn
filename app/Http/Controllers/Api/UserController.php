@@ -52,9 +52,6 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'string',
             'password' => 'min:3|confirmed',
-            'firstname' => 'string',
-            'lastname' => 'string',
-            'address' => 'string',
         ]);
 
         if($validator->fails()){
@@ -72,9 +69,7 @@ class UserController extends Controller
                 return response()->json([
                     'error'   => true,
                     'message' => 'User data already deleted',
-                    'data'    => [
-                        'entity' => $entity
-                    ]
+                    'data'    => []
                 ], 400);
             }
     
@@ -84,7 +79,15 @@ class UserController extends Controller
                 $userData->name = $request->get('name');
             }
             if ($request->get('password')) {
-                $userData->password = $request->get('password');
+                if (!Hash::check($request->get('password_old'), $userData->password)) {
+                    return response()->json([
+                        'error'   => true,
+                        'message' => 'Old password is not correct',
+                        'data'    => []
+                    ], 400);
+                }
+
+                $userData->password = Hash::make($request->get('password'));
             }
             if ($request->get('firstname')) {
                 $userData->firstname = $request->get('firstname');
@@ -107,6 +110,24 @@ class UserController extends Controller
             return response()->json([
                 'error'   => true,
                 'message' => 'Something went wrong when updating a user',
+                'data'    => []
+            ], 500);
+        }
+    }
+
+    public function reportTotal(Request $request) {
+        try {
+            $totalUser = User::count();
+
+            return response()->json([
+                'error'   => false,
+                'message' => 'Successfully creating a report for total student',
+                'data'    => $totalUser
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error'   => true,
+                'message' => 'Something went wrong when reporting total student',
                 'data'    => []
             ], 500);
         }

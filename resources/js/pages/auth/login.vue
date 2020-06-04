@@ -1,10 +1,10 @@
 <template>
   <div class="container">
     <div class="row">
-      <div class="col-4 mx-auto">
+      <div class="col-12 col-md-8 col-lg-4 mx-auto">
         <div class="card card-default mb-3">
-          <div class="card-body">
-            Login Page
+          <div class="card-body text-center">
+            Login to Access Course
           </div>
         </div>
         <div class="card card-default">
@@ -35,11 +35,16 @@
                   required
                 />
               </div>
-              <button type="submit" class="btn btn-primary">
+              <button type="submit" class="btn btn-primary d-block mx-auto">
                 Login
               </button>
             </form>
           </div>
+        </div>
+        <div class="text-center mt-4">
+          <router-link to="/auth/register">
+            Doesn't have account?
+          </router-link>
         </div>
       </div>
     </div>
@@ -69,10 +74,15 @@ export default {
         .then(
           () => {
             const { ref } = this.$route.query
+
             if (ref) {
               this.$router.push(ref)
             } else {
-              this.$router.push({ name: 'student-profile' })
+              if (this.$auth.user() && this.$auth.user().role === 'admin') {
+                this.$router.push({ name: 'dashboard' })
+              } else {
+                this.$router.push({ name: 'student-courses' })
+              }
             }
           },
           () => {

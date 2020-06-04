@@ -64,6 +64,10 @@ export default {
             path: "dashboard-user-course"
           },
           {
+            name: "Profile",
+            path: "profile"
+          },
+          {
             name: "Logout",
             logout: true
           }
@@ -74,13 +78,13 @@ export default {
             path: "home"
           },
           {
-            name: "Courses",
+            name: "My Courses",
             path: "student-courses",
             auth: true
           },
           {
             name: "Profile",
-            path: "student-profile"
+            path: "profile"
           },
           {
             name: "Logout",

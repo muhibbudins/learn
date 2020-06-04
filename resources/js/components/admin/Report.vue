@@ -3,7 +3,9 @@
     <div class="col-12 mb-3">
       <div class="card card-default">
         <div class="card-body">
-          <h6 class="card-title text-muted text-center">Student Register Report</h6>
+          <h6 class="card-title text-muted text-center">
+            Student Register Report
+          </h6>
           <div class="toolbar">
             <button
               :class="getActiveClass('one_month')"
@@ -27,14 +29,42 @@
           <apexchart
             type="area"
             height="350"
-            ref="chart"
-            :options="chartOptions"
-            :series="series"
+            ref="chart_line"
+            :options="registerOptions"
+            :series="registerSeries"
           />
         </div>
       </div>
     </div>
-    <div class="col-9">
+    <div class="col-6 mb-3">
+      <div class="card card-default">
+        <div class="card-body">
+          <h6 class="card-title text-muted text-center">Course Taken</h6>
+          <apexchart
+            type="donut"
+            height="250"
+            ref="chart_donut"
+            :options="totalOptions"
+            :series="totalSeries"
+          />
+        </div>
+      </div>
+    </div>
+    <div class="col-6 mb-3">
+      <div class="card card-default">
+        <div class="card-body">
+          <h6 class="card-title text-muted text-center">Course Total</h6>
+          <div class="text-center text-count">
+            <CountTo
+              :startVal="Math.random(0, 9)"
+              :endVal="reportCourseTotal"
+              :duration="3000"
+            ></CountTo>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 mb-3">
       <div class="card card-default">
         <div class="card-body">
           <h6 class="card-title text-muted text-center">Course Follower</h6>
@@ -51,22 +81,9 @@
         </div>
       </div>
     </div>
-    <div class="col-3">
-      <div class="card card-default">
-        <div class="card-body">
-          <h6 class="card-title text-muted text-center">Course Total</h6>
-          <div class="text-center text-count">
-            <CountTo
-              :startVal="Math.random(0, 9)"
-              :endVal="reportCourseTotal"
-              :duration="3000"
-            ></CountTo>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
+
 <script>
 import CountTo from "vue-count-to";
 
@@ -76,15 +93,15 @@ export default {
     let minimumDate = null;
 
     if (!minimumDate) {
-      minimumDate = current.setMonth(current.getMonth() - 1)
+      minimumDate = current.setMonth(current.getMonth() - 1);
     }
 
     return {
       reportCourseTotal: 0,
       reportCourseFollower: {},
       reportUserCount: {},
-      series: [],
-      chartOptions: {
+      registerSeries: [],
+      registerOptions: {
         chart: {
           type: "area",
           height: 350,
@@ -122,7 +139,26 @@ export default {
           }
         }
       },
-
+      totalSeries: [],
+      totalOptions: {
+        chart: {
+          type: "donut"
+        },
+        labels: ['Course Total', 'Course Taken'],
+        responsive: [
+          {
+            breakpoint: 480,
+            options: {
+              chart: {
+                width: 200
+              },
+              legend: {
+                position: "bottom"
+              }
+            }
+          }
+        ]
+      },
       selection: "one_month"
     };
   },
@@ -140,7 +176,8 @@ export default {
         url: `/v1/report/course/total`,
         method: "GET"
       }).then(({ data }) => {
-        this.reportCourseTotal = data.data;
+        this.reportCourseTotal = data.data.total;
+        this.totalSeries = [data.data.total, data.data.taken];
       });
     },
     loadFollowerReport(user_course, course) {
@@ -156,7 +193,7 @@ export default {
         url: `/v1/report/user`,
         method: "GET"
       }).then(({ data }) => {
-        this.series = data.data;
+        this.registerSeries = data.data;
         this.updateData("one_month");
       });
     },
@@ -166,8 +203,8 @@ export default {
         : "btn btn-sm btn-secondary";
     },
     updateData: function(timeline) {
-      if (!this.$refs.chart) {
-        return false
+      if (!this.$refs.chart_line) {
+        return false;
       }
 
       const currentDate = new Date();
@@ -175,19 +212,19 @@ export default {
 
       switch (timeline) {
         case "one_month":
-          this.$refs.chart.zoomX(
+          this.$refs.chart_line.zoomX(
             currentDate.setMonth(currentDate.getMonth() - 1),
             new Date().getTime()
           );
           break;
         case "six_months":
-          this.$refs.chart.zoomX(
+          this.$refs.chart_line.zoomX(
             currentDate.setMonth(currentDate.getMonth() - 6),
             new Date().getTime()
           );
           break;
         case "one_year":
-          this.$refs.chart.zoomX(
+          this.$refs.chart_line.zoomX(
             currentDate.setFullYear(currentDate.getFullYear() - 1),
             new Date().getTime()
           );
@@ -206,6 +243,10 @@ export default {
 .text-count {
   margin-top: 20px;
   font-size: 48px;
+  height: 245px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .table th,
 .table td {
