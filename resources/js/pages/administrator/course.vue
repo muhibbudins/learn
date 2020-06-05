@@ -69,10 +69,24 @@ export default {
         url: `/v1/master/course`,
         method: "POST",
         data: this.course
-      }).then(({ data }) => {
-        this.isLoaded = true;
-        this.course = {};
-      });
+      })
+        .then(({ data }) => {
+          this.isLoaded = true;
+        })
+        .catch(({ response: { data } }) => {
+          if (data.messages) {
+            for (const parameter in data.messages) {
+              this.$notify({
+                group: "alert",
+                type: "warn",
+                title: `Upps! Invalid parameter ${parameter}.`,
+                text: data.messages[parameter].join("\n")
+              });
+            }
+          }
+
+          this.isLoaded = true;
+        });
     }
   }
 };

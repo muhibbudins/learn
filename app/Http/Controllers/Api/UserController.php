@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\User;
+use App\UserCourse;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -52,9 +53,6 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'string',
             'password' => 'min:3|confirmed',
-            'firstname' => 'string',
-            'lastname' => 'string',
-            'address' => 'string',
         ]);
 
         if($validator->fails()){
@@ -72,9 +70,7 @@ class UserController extends Controller
                 return response()->json([
                     'error'   => true,
                     'message' => 'User data already deleted',
-                    'data'    => [
-                        'entity' => $entity
-                    ]
+                    'data'    => []
                 ], 400);
             }
     
@@ -84,7 +80,15 @@ class UserController extends Controller
                 $userData->name = $request->get('name');
             }
             if ($request->get('password')) {
-                $userData->password = $request->get('password');
+                if (!Hash::check($request->get('password_old'), $userData->password)) {
+                    return response()->json([
+                        'error'   => true,
+                        'message' => 'Old password is not correct',
+                        'data'    => []
+                    ], 400);
+                }
+
+                $userData->password = Hash::make($request->get('password'));
             }
             if ($request->get('firstname')) {
                 $userData->firstname = $request->get('firstname');
@@ -112,15 +116,35 @@ class UserController extends Controller
         }
     }
 
+    public function reportTotal(Request $request) {
+        try {
+            $totalUser = User::count();
+
+            return response()->json([
+                'error'   => false,
+                'message' => 'Successfully creating a report for total student',
+                'data'    => $totalUser
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error'   => true,
+                'message' => 'Something went wrong when reporting total student',
+                'data'    => []
+            ], 500);
+        }
+    }
+
     public function reportCount(Request $request) {
         try {
             $allReport = [];
             $allReportTemp = [];
             $allReportRoles = [];
-            $allUsers = User::where([
-                ['created_at', '>', 'DATE_SUB(NOW(), INTERVAL 1 YEAR)'],
-                ['role', '=', 'student']
-            ])->selectRaw('DATE(created_at) as date, role')->get();
+            // Disable this query cause mysql version on server is Ver 14.14 Distrib 5.7.30
+            // $allUsers = User::where([
+            //     ['created_at', '>', 'DATE_SUB(NOW(), INTERVAL 1 YEAR)'],
+            //     ['role', '=', 'student']
+            // ])->selectRaw('DATE(created_at) as date, role')->get();
+            $allUsers = User::selectRaw('DATE(created_at) as date, role')->where('role', '=', 'student')->get();
 
             foreach ($allUsers as $user) {
                 $timestamp = strtotime($user->date);
@@ -172,10 +196,35 @@ class UserController extends Controller
         }
     }
 
+    public function student(Request $request, $course) {
+        try {
+            $allStudent = UserCourse::select('user_id')->where('course_id', '=', $course)->pluck('user_id')->toArray();
+            $allJoinedUsers = User::select('id', 'name')->where('role', '=', 'student')->whereIn('id', $allStudent)->get();
+            $allAvailableUsers = User::select('id', 'name')->where('role', '=', 'student')->whereNotIn('id', $allStudent)->get();
+    
+            return response()->json([
+                'error'   => false,
+                'message' => 'Successfully creating a report for student',
+                'data'    => [
+                    'course' => $course,
+                    'joined' => $allJoinedUsers,
+                    'available' => $allAvailableUsers,
+                ]
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error'   => true,
+                'message' => 'Something went wrong when reading a user',
+                'data'    => []
+            ], 500);
+        }
+    }
+
     public function read(Request $request) {
         $entity = $request->get('entity');
         $includes = $request->get('includes');
         $trashed = $request->get('trashed');
+        $keyword = $request->get('keyword');
 
         try {
             // Force get only user data when access role not admin
@@ -193,7 +242,7 @@ class UserController extends Controller
             }
     
             else {
-                $users = User::paginate(10);
+                $users = User::where('name', 'like', '%'. $keyword .'%')->paginate(10);
                 $users->withPath('/master/user');
             }
     

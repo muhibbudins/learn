@@ -2,7 +2,6 @@
 
 use App\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,7 +12,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // $this->call(UsersTableSeeder::class);
+        /**
+         * Create default user for admin, lecturer and student
+         */
         User::create([
             'name' => 'Admin',
             'email' => 'admin@e-learning.com',
@@ -22,7 +23,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         User::create([
-            'name' => 'Lecturer',
+            'name' => 'Sample Lecturer',
             'email' => 'lecturer@e-learning.com',
             'password' => Hash::make('lecturer'),
             'role' => 'admin'
@@ -35,12 +36,10 @@ class DatabaseSeeder extends Seeder
             'role' => 'student'
         ]);
 
-        User::create([
-            'name' => 'Guest',
-            'email' => 'guest@e-learning.com',
-            'password' => Hash::make('guest'),
-            'role' => 'guest'
-        ]);
+        /**
+         * Create random 300 users with faker and role/password equal "student"
+         */
+        factory(App\User::class, 300)->create();
 
         // run with php artisan migrate --seed
     }

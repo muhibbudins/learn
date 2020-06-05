@@ -18,11 +18,17 @@
     <b-form-group id="fieldset-1" label="Course Content" label-for="input-1">
       <Editor :content="course.content" @contentChange="onContentChange" />
     </b-form-group>
-    <b-button class="mr-3" variant="success" @click="saveCourse">
-      Save Change
+    <b-button
+      class="mr-3"
+      variant="success"
+      @click="saveCourse"
+      :disabled="isLoading"
+    >
+      <span v-if="!isLoading">Save Change</span>
+      <b-spinner v-else small></b-spinner>
     </b-button>
     <b-button
-      v-if="!course.status"
+      v-if="!course.status && course.has_user === 0"
       class="mr-3"
       variant="danger"
       @click="deleteCourse"
@@ -47,7 +53,8 @@ export default {
   },
   data() {
     return {
-      lessonDataContent: ""
+      courseDataContent: "",
+      isLoading: false
     };
   },
   components: {
@@ -55,17 +62,37 @@ export default {
   },
   methods: {
     onContentChange(value) {
-      this.lessonDataContent = value;
+      this.courseDataContent = value;
     },
     saveCourse() {
-      this.course.content = this.lessonDataContent;
+      if (this.courseDataContent) {
+        this.course.content = this.courseDataContent;
+      }
+
+      this.isLoading = true;
+
       this.$http({
         url: `/v1/master/course/update/${this.course.id}`,
         method: "POST",
         data: this.course
-      }).then(({ data }) => {
-        //
-      });
+      })
+        .then(({ data }) => {
+          this.isLoading = false;
+        })
+        .catch(({ response: { data } }) => {
+          if (data.messages) {
+            for (const parameter in data.messages) {
+              this.$notify({
+                group: "alert",
+                type: "warn",
+                title: `Upps! Invalid parameter ${parameter}.`,
+                text: data.messages[parameter].join("\n")
+              });
+            }
+          }
+
+          this.isLoading = false;
+        });
     },
     deleteCourse() {
       this.$http({

@@ -9,7 +9,7 @@
             <p>{{ content.created_at }}</p>
             <div
               v-if="content.content"
-              v-html="compileToHTML(content.content)"
+              v-html="content.content"
             ></div>
           </div>
           <div class="col-5">
@@ -46,29 +46,15 @@
         </div>
       </div>
     </div>
-    <!-- <div class="card card-default">
-      <div class="card-body text-center">
-        <button class="btn btn-outline-primary">
-          Start Learning
-        </button>
-      </div>
-    </div> -->
   </section>
 </template>
 
 <script>
-import markdown from "marked";
-
 export default {
   props: {
     content: {
       type: [Object, Array],
       default: () => {}
-    }
-  },
-  methods: {
-    compileToHTML(text) {
-      return markdown(text, { sanitize: true });
     }
   }
 };

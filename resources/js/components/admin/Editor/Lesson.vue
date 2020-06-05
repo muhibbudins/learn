@@ -60,12 +60,18 @@
           @contentChange="onContentChange"
         />
       </b-form-group>
-      <b-button class="mr-3" variant="success" @click="saveLesson">
-        Save Change
+      <b-button
+        class="mr-3"
+        variant="success"
+        @click="saveLesson"
+        :disabled="isLoading"
+      >
+        <span v-if="!isLoading">Save Change</span>
+        <b-spinner v-else small></b-spinner>
       </b-button>
       <b-button
         class="mr-3"
-        v-if="!course.status && !isCreateAction"
+        v-if="!course.status && course.has_user === 0 && !isCreateAction"
         variant="danger"
         @click="deleteLesson"
       >
@@ -93,6 +99,7 @@ export default {
   },
   data() {
     return {
+      isLoading: false,
       isLoadedState: true,
       isCreateAction: false,
       moduleSelected: null,
@@ -207,37 +214,76 @@ export default {
         return;
       }
 
-      this.lessonData.content = this.lessonDataContent;
+      this.lessonState.title = null;
+      this.lessonState.description = null;
+
+      if (this.lessonDataContent) {
+        this.lessonData.content = this.lessonDataContent;
+      }
+
+      this.isLoading = true;
 
       if (this.isCreateAction) {
         this.$http({
           url: "/v1/master/module/lesson",
           method: "POST",
           data: this.lessonData
-        }).then(
-          ({
-            data: {
-              data: { id, title }
+        })
+          .then(
+            ({
+              data: {
+                data: { id, title }
+              }
+            }) => {
+              this.lessonOptions.push({
+                value: id,
+                text: title
+              });
+              this.lessonData = null;
+              this.lessonSelected = null;
+              this.isLoading = false;
             }
-          }) => {
-            this.lessonOptions.push({
-              value: id,
-              text: title
-            });
-            this.lessonData = null;
-            this.lessonSelected = null;
-          }
-        );
+          )
+          .catch(({ response: { data } }) => {
+            if (data.messages) {
+              for (const parameter in data.messages) {
+                this.$notify({
+                  group: "alert",
+                  type: "warn",
+                  title: `Upps! Invalid parameter ${parameter}.`,
+                  text: data.messages[parameter].join("\n")
+                });
+              }
+            }
+
+            this.isLoading = false;
+          });
       } else {
         this.$http({
           url: `/v1/master/module/lesson/update/${this.lessonSelected}`,
           method: "POST",
           data: this.lessonData
-        }).then(({ data }) => {
-          this.updateCombobox(this.lessonData);
-          this.lessonData = null;
-          this.lessonSelected = null;
-        });
+        })
+          .then(({ data }) => {
+            this.updateCombobox(this.lessonData);
+            this.lessonData = null;
+            this.lessonSelected = null;
+            this.isLoading = false;
+          })
+          .catch(({ response: { data } }) => {
+            if (data.messages) {
+              for (const parameter in data.messages) {
+                this.$notify({
+                  group: "alert",
+                  type: "warn",
+                  title: `Upps! Invalid parameter ${parameter}.`,
+                  text: data.messages[parameter].join("\n")
+                });
+              }
+            }
+
+            this.isLoading = false;
+          });
       }
     },
     deleteLesson() {

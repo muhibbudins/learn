@@ -9,10 +9,15 @@
             </h6>
           </div>
           <div class="col-4 ml-auto text-right">
-            <b-button v-if="course.status" size="sm" variant="secondary">
-              &nbsp;
+            <b-button
+              v-if="course.status"
+              size="sm"
+              variant="warning"
+              @click="unPublishCourse"
+            >
+              Unpublish Course
             </b-button>
-            <b-button v-else size="sm" variant="info">
+            <b-button v-else size="sm" variant="info" @click="publishCourse">
               Publish Course
             </b-button>
           </div>
@@ -32,8 +37,13 @@
       >
         This course still in draft
       </div>
-      <b-tabs v-if="isLoaded" content-class="mt-3" align="center">
-        <b-tab active>
+      <b-tabs
+        v-if="isLoaded"
+        v-model="tabActive"
+        content-class="mt-3"
+        align="center"
+      >
+        <b-tab>
           <template slot="title">
             <h6 class="text-muted my-2">Course</h6>
           </template>
@@ -46,7 +56,7 @@
             <h6 class="text-muted my-2">Module</h6>
           </template>
           <div class="card-body">
-            <EditorModule :course="course" />
+            <EditorModule :course="course" @need-update="updateCourse" />
           </div>
         </b-tab>
         <b-tab>
@@ -54,7 +64,7 @@
             <h6 class="text-muted my-2">Module Lessons</h6>
           </template>
           <div class="card-body">
-            <EditorLesson :course="course" />
+            <EditorLesson :course="course" @need-update="updateCourse" />
           </div>
         </b-tab>
         <b-tab>
@@ -62,7 +72,7 @@
             <h6 class="text-muted my-2">Module Quizzes</h6>
           </template>
           <div class="card-body">
-            <EditorQuiz :course="course" />
+            <EditorQuiz :course="course" @need-update="updateCourse" />
           </div>
         </b-tab>
       </b-tabs>
@@ -81,6 +91,8 @@ export default {
   data() {
     return {
       course: {},
+      courseId: 0,
+      tabActive: 0,
       isLoaded: false
     };
   },
@@ -94,10 +106,36 @@ export default {
     const {
       params: { course_id }
     } = this.$route;
+    this.courseId = course_id;
     this.getCourses(course_id);
   },
   methods: {
+    unPublishCourse() {
+      this.course.status = "0";
+      this.$http({
+        url: `/v1/master/course/update/${this.courseId}`,
+        method: "POST",
+        data: this.course
+      }).then(({ data: { data } }) => {
+        this.getCourses(this.courseId);
+      });
+    },
+    publishCourse() {
+      this.course.status = "1";
+      this.$http({
+        url: `/v1/master/course/update/${this.courseId}`,
+        method: "POST",
+        data: this.course
+      }).then(({ data: { data } }) => {
+        this.getCourses(this.courseId);
+      });
+    },
+    updateCourse(index) {
+      this.getCourses(this.courseId);
+      this.tabActive = index;
+    },
     getCourses(entity) {
+      this.isLoaded = false;
       this.$http({
         url: `/v1/master/course?entity=${entity}`,
         method: "GET"

@@ -4,6 +4,7 @@
     <div class="container my-4">
       <router-view />
     </div>
+    <notifications group="alert" position="bottom right" />
   </content>
 </template>
 <script>

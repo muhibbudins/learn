@@ -3,13 +3,15 @@
     <div class="alert alert-danger" v-if="errorMessage">
       {{ errorMessage }}
     </div>
-    <b-pagination
-      v-model="usercourses.current_page"
-      :total-rows="usercourses.total"
-      :per-page="usercourses.per_page"
-      aria-controls="my-table"
-      @change="getUserCourses($event)"
-    />
+    <div class="row justify-content-end">
+      <b-pagination
+        v-model="usercourses.current_page"
+        :total-rows="usercourses.total"
+        :per-page="usercourses.per_page"
+        aria-controls="my-table"
+        @change="getUserCourses($event)"
+      />
+    </div>
     <b-table hover :items="usercourses.data" :fields="fields" />
   </div>
 </template>
@@ -20,10 +22,6 @@ export default {
     return {
       errorMessage: false,
       fields: [
-        {
-          key: "id",
-          label: "ID"
-        },
         {
           key: "user.name",
           label: "Username"

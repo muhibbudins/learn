@@ -33,6 +33,16 @@ Route::prefix('v1')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
+    | Reporting routes for general user with access to /api/v1/report/
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('report')->group(function () {
+        Route::get('course/total', 'Api\CourseController@reportTotal');
+        Route::get('user/total', 'Api\UserController@reportTotal');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
     | Authenticated routes
     |--------------------------------------------------------------------------
     */
@@ -88,7 +98,6 @@ Route::middleware(['administrator'])->prefix('v1')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::prefix('report')->group(function () {
-        Route::get('course/total', 'Api\CourseController@reportTotal');
         Route::get('course/follower', 'Api\UserCourseController@reportFollower');
         Route::get('user', 'Api\UserController@reportCount');
     });
@@ -124,6 +133,7 @@ Route::middleware(['administrator'])->prefix('v1')->group(function () {
         Route::post('module/quiz/choice/update/{id}', 'Api\ModuleQuizChoiceController@update');
 
         Route::get('user', 'Api\UserController@read');
+        Route::get('student/{course}', 'Api\UserController@student');
         Route::post('user', 'Api\UserController@create');
         Route::post('user/update/{id}', 'Api\UserController@update'); 
 

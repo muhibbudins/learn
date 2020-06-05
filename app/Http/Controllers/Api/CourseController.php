@@ -156,7 +156,10 @@ class CourseController extends Controller
 
     public function reportTotal(Request $request) {
         try {
-            $courseData = Course::where('status', 1)->count();
+            $courseData = [
+                'total' => Course::where('status', 1)->count(),
+                'taken' => UserCourse::groupBy('course_id')->count(),
+            ];
 
             return response()->json([
                 'error'   => false,
@@ -176,6 +179,7 @@ class CourseController extends Controller
         $entity = $request->get('entity');
         $includes = $request->get('includes');
         $trashed = $request->get('trashed');
+        $keyword = $request->get('keyword');
 
         try {
             if ($entity || $includes) {
@@ -184,8 +188,11 @@ class CourseController extends Controller
                 $coursesQuizzes = [];
 
                 $courses = Course::find($entity ?? explode(',', $includes));
+                $hasUser = UserCourse::where([
+                    'course_id' => $entity
+                ])->count();
 
-
+                $courses['has_user'] = $hasUser;
                 foreach ($courses->modules as $module) {
                     $coursesModules[] = [
                         'value' => $module['id'],
@@ -221,7 +228,7 @@ class CourseController extends Controller
             }
     
             else {
-                $courses = Course::where('status', '>', -1)->paginate(10);
+                $courses = Course::where('status', '>', -1)->where('title', 'like', '%'. $keyword .'%')->paginate(10);
                 $courses->withPath('/master/courses');
             }
     
@@ -277,7 +284,6 @@ class CourseController extends Controller
             'title' => 'string',
             'description' => 'string',
             'content' => 'string',
-            'status' => 'integer',
         ]);
 
         if($validator->fails()){
@@ -322,8 +328,8 @@ class CourseController extends Controller
             if ($request->get('content')) {
                 $courseData->content = $request->get('content');
             }
-            if ($request->get('status')) {
-                $courseData->status = $request->get('status');
+            if ($request->get('status') !== null) {
+                $courseData->status = (int) $request->get('status');
             }
 
             $courseData->save();

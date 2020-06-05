@@ -24,7 +24,7 @@ class UserCourse extends Model
    */
   public function course()
   {
-      return $this->belongsTo('App\Course')->select('id', 'title', 'status', 'created_at');
+      return $this->belongsTo('App\Course')->select('id', 'title', 'status', 'description', 'created_at')->where('status', 1);
   }
 
   /**
@@ -49,5 +49,14 @@ class UserCourse extends Model
   public function quizzes()
   {
       return $this->hasMany('App\UserCourseQuiz');
+  }
+
+  public static function boot() {
+    parent::boot();
+
+    static::deleting(function($userCourse) { // before delete() method call this
+         $userCourse->modules()->delete();
+         $userCourse->quizzes()->delete();
+    });
   }
 }

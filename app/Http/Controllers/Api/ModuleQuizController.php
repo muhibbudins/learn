@@ -166,6 +166,18 @@ class ModuleQuizController extends Controller
             }
 
             $moduleQuizData->save();
+
+            $moduleQuizData['questions'] = $moduleQuizData->questions;
+
+            foreach ($moduleQuizData['questions'] as $question) {
+                $questionAnswer = 0;
+                foreach ($question->choices as $choice) {
+                    if ($choice->answer) {
+                        $questionAnswer = $choice->id;
+                    }
+                }
+                $question['answer'] = $questionAnswer;
+            }
     
             return response()->json([
                 'error'   => false,
