@@ -3,10 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\ModuleLesson;
-
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-
 use Illuminate\Support\Facades\Validator;
 
 class ModuleLessonController extends Controller
