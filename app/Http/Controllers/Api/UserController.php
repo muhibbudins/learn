@@ -4,12 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\User;
 use App\UserCourse;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Controller;
-
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller

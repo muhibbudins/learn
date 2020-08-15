@@ -3,10 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\UserCourseQuiz;
-
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-
 use Illuminate\Support\Facades\Validator;
 
 class UserCourseQuizController extends Controller
